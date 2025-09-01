@@ -1,7 +1,6 @@
 const API_URL = process.env.REACT_APP_API_URL // || "http://localhost:8080";
 
 export const getWorkouts = async () => {
-  console.log("TEST: ", API_URL)
   const res = await fetch(`${API_URL}/api/workout`);
   return res.json();
 };
