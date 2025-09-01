@@ -25,6 +25,7 @@ jobs:
 
       # 4. Build React app
       - name: Build React app
+        run: npm run build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
@@ -36,7 +37,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          source: "*"
+          source: "dist/*"
           target: /var/www/html/gains/
 
       # 6. Optional: Restart Nginx (if needed)
