@@ -25,11 +25,8 @@ jobs:
 
       # 4. Build React app
       - name: Build React app
-        run: |
-          echo "REACT_APP_API_URL=$REACT_APP_API_URL" >> $GITHUB_ENV
-          npm run build
         env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          REACT_APP_API_URL: ${{ secrets.VITE_API_URL }}
 
       # 5. Copy build to server
       - name: Copy frontend to server
