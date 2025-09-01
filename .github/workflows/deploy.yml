@@ -35,7 +35,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          source: "build/*"
+          source: "*"
           target: /var/www/html/gains/
 
       # 6. Optional: Restart Nginx (if needed)
