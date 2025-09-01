@@ -23,12 +23,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Set REACT_APP_API_URL
-        run: echo "REACT_APP_API_URL=https://${{ secrets.SERVER_HOST }}" >> $GITHUB_ENV
-
       # 4. Build React app
       - name: Build React app
         run: npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
 
       # 5. Copy build to server
       - name: Copy frontend to server
