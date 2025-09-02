@@ -70,7 +70,7 @@ export default function ExeciseDetails() {
                 >
                   <span>{set.order}</span>
                   <span>{set.reps}</span>
-                  <span>{set.weight} kg</span>
+                  <span>{set.weight <= 1 ? "BW" : `${set.weight} kg`} </span>
                 </div>
               ))}
             </div>

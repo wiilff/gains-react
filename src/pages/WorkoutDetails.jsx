@@ -26,6 +26,8 @@ export default function WorkoutDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newExerciseName, setNewExerciseName] = useState("")
 
+  const [saveMessage, setIsSavedMessage] = useState("Save Changes")
+
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -81,7 +83,6 @@ export default function WorkoutDetails() {
   
   const submitExerciseToWorkout = async (exerciseId) => {
     try {
-      console.log(exerciseId);
       await postExerciseToWorkout({
         workout_id: id,
         exercise_id: exerciseId,
@@ -133,23 +134,27 @@ export default function WorkoutDetails() {
     }));
   };
 
-  const deleteSet = async (workoutExerciseId, setId) => {
+  const deleteSet = async (workoutExerciseId, setId, isPersisted) => {
+
+
+
     setWorkoutDetails((prev) => ({
       ...prev,
       exercises: prev.exercises.map((ex) =>
         ex.workoutExerciseId === workoutExerciseId
           ? {
               ...ex,
-              sets: ex.sets.filter((set) => set.setId !== setId),
+              sets: ex.sets.filter(
+                (set) => (set.setId ?? set.tempId) !== setId
+              ),
             }
           : ex
       ),
     }));
 
-    if (setId) {
+    if (isPersisted) {
       try {
         const response = await deleteById(setId);
-        console.log("Set deleted:", response);
       } catch (error) {
         console.error("Error saving sets:", error);
       }
@@ -191,7 +196,12 @@ export default function WorkoutDetails() {
 
     try {
       const response = await updateExerciseSets(payload);
-      console.log("Sets saved successfully:", response);
+      setIsSavedMessage("Changes saved")
+
+      setTimeout(() => {
+        setIsSavedMessage("Save Changes")
+      }, 1000)
+  
     } catch (error) {
       console.error("Error saving sets:", error);
       // Optionally, show a user-friendly error message in the UI
@@ -301,21 +311,21 @@ export default function WorkoutDetails() {
                       exercise.workoutExerciseId,
                       set.setId || set.tempId,
                       "reps",
-                      Number(e.target.value)
+                      e.target.value
                     )
                   }
                   className="border p-1 rounded w-20"
                 />
                 <input
                   type="number"
-                  value={set.weight}
+                  value={set.weight ?? "" }
                   placeholder="Weight"
                   onChange={(e) =>
                     handleSetChange(
                       exercise.workoutExerciseId,
                       set.setId || set.tempId,
                       "weight",
-                      Number(e.target.value)
+                      e.target.value
                     )
                   }
                   className="border p-1 rounded w-20"
@@ -323,7 +333,7 @@ export default function WorkoutDetails() {
                 <X
                   className="text-red-500 cursor-pointer"
                   onClick={() =>
-                    deleteSet(exercise.workoutExerciseId, set.setId)
+                    deleteSet(exercise.workoutExerciseId, set.setId ?? set.tempId, Boolean(set.setId))
                   }
                 />
               </div>
@@ -342,7 +352,7 @@ export default function WorkoutDetails() {
                 className="text-green-500 font-medium"
                 onClick={() => saveExerciseSets(exercise.workoutExerciseId)}
               >
-                Save Changes
+                { saveMessage }
               </button>
             </div>
           </div>
