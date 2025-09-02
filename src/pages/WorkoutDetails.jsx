@@ -375,7 +375,7 @@ export default function WorkoutDetails() {
             className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
           />
 
-          <CreateButton className="w-full" title="Create workout" />
+          <CreateButton className="w-full" title="Create exercise" />
 
         </form>
 
