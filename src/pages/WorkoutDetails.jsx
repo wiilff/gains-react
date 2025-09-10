@@ -435,7 +435,6 @@ export default function WorkoutDetails() {
           <CreateButton className="w-full" title="Create exercise" />
         </form>
 
-        <Popup message={popupMessage} onClose={() => setPopupMessage("")} />
       </CreateWorkoutModal>
 
       {/* Bottom Navigation */}

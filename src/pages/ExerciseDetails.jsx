@@ -3,6 +3,7 @@ import BottomNav from "../components/Nav";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
 import Graph from "../components/Graph.jsx";
+import PersonalRecords from "../components/PersonalRecords.jsx";
 import { getExerciseDetails } from "../api/exercises.js";
 import { useEffect, useState } from "react";
 
@@ -37,6 +38,7 @@ export default function ExeciseDetails() {
       />
 
       <Graph exerciseDetails={exerciseDetails} />
+      <PersonalRecords exerciseDetails={exerciseDetails} />
 
       <div className="mt-6 space-y-6">
         {exerciseDetails.map((detail, index) => 

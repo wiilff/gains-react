@@ -19,4 +19,21 @@ export const createWorkout = async (data) => {
   return res.json();
 };
 
+export const updateWorkout = async (id, data) => {
+  const res = await fetch(`${API_URL}/api/workout/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export const deleteWorkout = async (id) => {
+  const res = await fetch(`${API_URL}/api/workout/${id}`, {
+    method: "DELETE"
+  });
+  return res.json();
+}
+
+ 
 
