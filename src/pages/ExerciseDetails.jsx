@@ -81,7 +81,7 @@ export default function ExeciseDetails() {
 
             </div>
           </div>
-          ) : null
+          ) : <div><p>No data yet</p></div>
         )}
       </div>
 

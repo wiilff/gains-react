@@ -23,6 +23,8 @@ export default function PersonalRecords({ exerciseDetails }) {
     });
   });
 
+	if (pr.weight === 0) return null;
+
   return (
     <div className="mt-6 flex gap-4">
       {/* Left Div */}

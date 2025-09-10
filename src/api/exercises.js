@@ -21,3 +21,8 @@ export const getExerciseDetails = async (id) => {
   return res.json();
 }
 
+export const getExerciseStats = async () => {
+  const res = await fetch(`${API_URL}/api/exercise/stats`);
+  return res.json();
+}
+
