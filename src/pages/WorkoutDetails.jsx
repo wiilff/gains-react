@@ -3,6 +3,7 @@ import BottomNav from "../components/Nav";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
 import CreateButton from "../components/CreateButton";
+import Popup from "../components/Popup";
 import { v4 as uuidv4 } from "uuid";
 import { Dumbbell, Eye, Trash2, Search, X } from "lucide-react";
 import { getWorkoutDetails } from "../api/workouts";
@@ -24,9 +25,13 @@ export default function WorkoutDetails() {
   const [hasSearched, setHasSearched] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newExerciseName, setNewExerciseName] = useState("")
+  const [newExerciseName, setNewExerciseName] = useState("");
 
-  const [saveMessage, setIsSavedMessage] = useState("Save Changes")
+  const [popupMessage, setPopupMessage] = useState(null);
+
+  const showPopup = (text, type = "success") => {
+    setPopupMessage({ text, type });
+  };
 
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -68,29 +73,43 @@ export default function WorkoutDetails() {
     }
   };
 
-  // I THINK ORDER IS FUCKING THIS
-  const submitExercise = async () => {
+  const submitExercise = async (e) => {
+    e.preventDefault();
+
     try {
-      const newExercise = await createExercise(newExerciseName);
+      const res = await createExercise(newExerciseName);
 
-      await submitExerciseToWorkout(newExercise._id);
-
+      if (res.message) {
+        showPopup(res.message, "error");
+      } else {
+        setNewExerciseName("");
+        setIsModalOpen(false); // close modal immediately
+        showPopup("Exercise created successfully!", "success");
+      }
     } catch (err) {
       console.log(err);
+      showPopup("Something went wrong", "error");
     }
   };
 
-  
   const submitExerciseToWorkout = async (exerciseId) => {
     try {
-      await postExerciseToWorkout({
+      const res = await postExerciseToWorkout({
         workout_id: id,
         exercise_id: exerciseId,
       });
       const updatedWorkout = await getWorkoutDetails(id);
       setWorkoutDetails(updatedWorkout);
+
+      if(res.message) {
+        showPopup(res.message, "error");
+      } else {
+        showPopup("Exercise added!", "success");
+      }
+
     } catch (err) {
-      console.error(err);
+      console.error(err)
+      showPopup("Something went wrong", "error");
     }
   };
 
@@ -135,9 +154,6 @@ export default function WorkoutDetails() {
   };
 
   const deleteSet = async (workoutExerciseId, setId, isPersisted) => {
-
-
-
     setWorkoutDetails((prev) => ({
       ...prev,
       exercises: prev.exercises.map((ex) =>
@@ -154,7 +170,8 @@ export default function WorkoutDetails() {
 
     if (isPersisted) {
       try {
-        const response = await deleteById(setId);
+        const res = await deleteById(setId);
+
       } catch (error) {
         console.error("Error saving sets:", error);
       }
@@ -165,10 +182,18 @@ export default function WorkoutDetails() {
     try {
       await deleteExerciseFromWorkout(workoutExerciseId);
 
-      const updatedWorkout = await getWorkoutDetails(id); // fetch fresh state
-      setWorkoutDetails(updatedWorkout);
+      const res = await getWorkoutDetails(id); // fetch fresh state
+      setWorkoutDetails(res);
+
+      if(res.message) {
+        showPopup(res.message, "error");
+      } else {
+        showPopup("Exercise removed!", "success");
+      }
+
     } catch (err) {
       console.error(err);
+      showPopup("Something went wrong", "error");
     }
   };
 
@@ -195,16 +220,35 @@ export default function WorkoutDetails() {
     };
 
     try {
-      const response = await updateExerciseSets(payload);
-      setIsSavedMessage("Changes saved")
+      const res = await updateExerciseSets(payload);
+      console.log(res);
 
-      setTimeout(() => {
-        setIsSavedMessage("Save Changes")
-      }, 1000)
-  
+      if(res.message) {
+        showPopup(res.message, "error");
+      } else {
+        showPopup("Sets saved!", "success");
+      }
+
+      const updatedSets = res.map((s) => ({
+        setId: s._id,
+        reps: s.reps,
+        weight: s.weight,
+        order: s.order,
+        workoutExerciseId: s.workoutExerciseId,
+      }));
+
+      // overwrite exercise sets in state
+      setWorkoutDetails((prev) => ({
+        ...prev,
+        exercises: prev.exercises.map((ex) =>
+          ex.workoutExerciseId === workoutExerciseId
+            ? { ...ex, sets: updatedSets }
+            : ex
+        ),
+      }));
     } catch (error) {
       console.error("Error saving sets:", error);
-      // Optionally, show a user-friendly error message in the UI
+      showPopup("Something went wrong", "error");
     }
   };
 
@@ -214,7 +258,7 @@ export default function WorkoutDetails() {
     <div className="min-h-screen pt-16 pb-16 px-7">
       {/* Header */}
       <Header
-        title={workoutDetails.name}
+        title={workoutDetails.name.toUpperCase()}
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 
@@ -255,14 +299,16 @@ export default function WorkoutDetails() {
               >
                 <div className="flex items-center space-x-3">
                   <Dumbbell className="text-blue-500" />
-                  <span className="font-medium">{exercise.name}</span>
+                  <span className="font-medium">
+                    {exercise.name.toUpperCase()}
+                  </span>
                 </div>
                 <Eye className="text-gray-400" />
               </div>
             ))}
         </div>
 
-        { (hasSearched && searchResults.length === 0) ? (
+        {hasSearched && searchResults.length === 0 ? (
           <div>
             <CreateButton
               title="Exercise missing? Add it here"
@@ -285,7 +331,7 @@ export default function WorkoutDetails() {
                 onClick={() => navigate(`/exercise/${exercise.exerciseId}`)}
                 className="font-semibold text-lg cursor-pointer"
               >
-                {exercise.name}
+                {exercise.name.toUpperCase()}
               </h3>
 
               <Trash2
@@ -318,7 +364,7 @@ export default function WorkoutDetails() {
                 />
                 <input
                   type="number"
-                  value={set.weight ?? "" }
+                  value={set.weight ?? ""}
                   placeholder="Weight"
                   onChange={(e) =>
                     handleSetChange(
@@ -333,7 +379,11 @@ export default function WorkoutDetails() {
                 <X
                   className="text-red-500 cursor-pointer"
                   onClick={() =>
-                    deleteSet(exercise.workoutExerciseId, set.setId ?? set.tempId, Boolean(set.setId))
+                    deleteSet(
+                      exercise.workoutExerciseId,
+                      set.setId ?? set.tempId,
+                      Boolean(set.setId)
+                    )
                   }
                 />
               </div>
@@ -352,12 +402,19 @@ export default function WorkoutDetails() {
                 className="text-green-500 font-medium"
                 onClick={() => saveExerciseSets(exercise.workoutExerciseId)}
               >
-                { saveMessage }
+                Save changes
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {popupMessage && (
+        <Popup
+          message={popupMessage}
+          onClose={() => setPopupMessage(null)}
+        />
+      )}
 
       {/*MODAL*/}
 
@@ -376,9 +433,9 @@ export default function WorkoutDetails() {
           />
 
           <CreateButton className="w-full" title="Create exercise" />
-
         </form>
 
+        <Popup message={popupMessage} onClose={() => setPopupMessage("")} />
       </CreateWorkoutModal>
 
       {/* Bottom Navigation */}

@@ -32,14 +32,15 @@ export default function ExeciseDetails() {
     <div className="min-h-screen pt-16 pb-16 px-7">
       {/* Header */}
       <Header
-        title="EXERCISE"
+        title={exerciseDetails[0].exerciseName.toUpperCase()}
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 
       <Graph exerciseDetails={exerciseDetails} />
 
       <div className="mt-6 space-y-6">
-        {exerciseDetails.map((detail, index) => (
+        {exerciseDetails.map((detail, index) => 
+          detail.sets.length > 0 ? (
           <div
             key={index}
             className="bg-gray-300 p-4 rounded-xl shadow-md border border-gray-200"
@@ -63,6 +64,7 @@ export default function ExeciseDetails() {
 
             {/* Sets */}
             <div className="space-y-1">
+              
               {detail.sets.map((set, setIndex) => (
                 <div
                   key={setIndex}
@@ -72,10 +74,13 @@ export default function ExeciseDetails() {
                   <span>{set.reps}</span>
                   <span>{set.weight <= 1 ? "BW" : `${set.weight} kg`} </span>
                 </div>
+                
               ))}
+
             </div>
           </div>
-        ))}
+          ) : null
+        )}
       </div>
 
       {/* Bottom Navigation */}
