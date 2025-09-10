@@ -46,6 +46,13 @@ export default function Workouts() {
     setIsModalOpen(true);
   };
 
+  const clearModal = () => {
+    setWorkoutName("");
+    setWorkoutDate("");
+    setWorkoutNotes("");
+    setIsModalOpen(false);
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -217,7 +224,7 @@ export default function Workouts() {
       {/* Modal */}
       <CreateWorkoutModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => clearModal()}
         title={editingWorkout ? "Edit Workout" : "Create a New Workout"}
       >
         <form className="space-y-4" onSubmit={submitWorkout}>
