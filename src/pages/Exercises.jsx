@@ -33,7 +33,7 @@ export default function Exercises() {
     }
 
     const filtered = exercises.filter((exercise) =>
-      exercise.name.toLowerCase().includes(value.toLowerCase())
+      exercise.exerciseName.toLowerCase().includes(value.toLowerCase())
     );
     setSearchResults(filtered);
   };
@@ -69,20 +69,20 @@ export default function Exercises() {
       <div className="mt-6 space-y-4">
         {(searchQuery ? searchResults : exercises).map((exercise) => (
           <div
-            key={exercise._id}
+            key={exercise.exerciseId}
             className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition cursor-pointer"
-            onClick={() => navigate(`/exercise/${exercise._id}`)}
+            onClick={() => navigate(`/exercise/${exercise.exerciseId}`)}
           >
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold">
-                {exercise.name.toUpperCase()}
+                {exercise.exerciseName.toUpperCase()}
               </h2>
               <ChevronRight className="w-5 h-5 text-gray-400" />
             </div>
 
             <div className="flex items-center text-gray-700 text-sm">
               <Dumbbell className="w-4 h-4 mr-2 text-blue-500" />
-              <span>{exercise.setCount} total sets</span>
+              <span>{exercise.setCount} total sets in {exercise.workoutCount} workouts</span>
             </div>
           </div>
         ))}

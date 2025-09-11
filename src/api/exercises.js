@@ -1,28 +1,22 @@
-const API_URL = import.meta.env.VITE_API_URL
+import api from "../api/axios"
 
 export const getExercises = async () => {
-  const res = await fetch(`${API_URL}/api/exercise`);
-  return res.json();
+  const res = await api.get(`/api/exercise`);
+  return res.data;
 };
 
 export const createExercise = async (name) => {
-  const res = await fetch(`${API_URL}/api/exercise`, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ name })
-  });
-  return res.json();
+  const res = await api.post(`/api/exercise`, { name } )
+  return res.data;
 };
 
 export const getExerciseDetails = async (id) => {
-  const res = await fetch(`${API_URL}/api/exercise/${id}`);
-  return res.json();
+  const res = await api.get(`/api/exercise/${id}`);
+  return res.data;
 }
 
 export const getExerciseStats = async () => {
-  const res = await fetch(`${API_URL}/api/exercise/stats`);
-  return res.json();
+  const res = await api.get(`/api/exercise/stats`);
+  return res.data;
 }
 

@@ -4,16 +4,71 @@ import Workouts from "./pages/Workouts";
 import WorkoutDetails from "./pages/WorkoutDetails";
 import ExeciseDetails from "./pages/ExerciseDetails";
 import Execises from "./pages/Exercises";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
+import { AuthProvider } from "./context/AuthContext";
 
 export default function App() {
   return (
-    
       <Routes>
-        <Route path="/" element={<Workouts />} />
-        <Route path="/workout/:id" element={<WorkoutDetails />} />
-        <Route path="/exercise/:id" element={<ExeciseDetails />} />
-        <Route path="/exercise" element={<Execises />} />
+
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Workouts />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/workout/:id"
+          element={
+            <PrivateRoute>
+              <WorkoutDetails />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/exercise/:id"
+          element={
+            <PrivateRoute>
+              <ExeciseDetails />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/exercise"
+          element={
+            <PrivateRoute>
+              <Execises />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
-    
+  
   );
 }

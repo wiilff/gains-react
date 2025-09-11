@@ -1,11 +1,11 @@
-import { Dumbbell, ChartNoAxesCombined, Home } from "lucide-react";
+import { Dumbbell, CircleUserRound, Home } from "lucide-react";
 
 
 export default function BottomNav({ currPage }) {
   const navItems = [
     { name: "Home", icon: Home, href: "/" },
     { name: "Exercises", icon: Dumbbell, href: "/exercise" },
-    { name: "Graphs", icon: ChartNoAxesCombined, href: "/" },
+    { name: "Profile", icon: CircleUserRound, href: "/profile" },
   ];
 
   return (
