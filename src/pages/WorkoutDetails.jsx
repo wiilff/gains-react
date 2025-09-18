@@ -27,6 +27,8 @@ export default function WorkoutDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newExerciseName, setNewExerciseName] = useState("");
 
+  const [val, setVal] = useState("");
+
   const [popupMessage, setPopupMessage] = useState(null);
 
   const showPopup = (text, type = "success") => {
@@ -195,7 +197,7 @@ export default function WorkoutDetails() {
   };
 
   const saveExerciseSets = async (workoutExerciseId) => {
-    // Find the exercise in your state
+    // Find the exercise in state
     const exercise = workoutDetails.exercises.find(
       (ex) => ex.workoutExerciseId === workoutExerciseId
     );
@@ -209,7 +211,7 @@ export default function WorkoutDetails() {
     const payload = {
       workoutExerciseId: exercise.workoutExerciseId,
       sets: exercise.sets.map((set) => {
-        if (Number.isNaN(set.reps) || Number.isNaN(set.weight)) {
+        if (isNaN(set.reps) || isNaN(set.weight)) {
           showPopup("Only numbers, please", "error");
           return;
         }
