@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   getWorkouts,
   createWorkout,
@@ -51,7 +53,7 @@ export default function Workouts() {
     setWorkoutDate("");
     setWorkoutNotes("");
     setIsModalOpen(false);
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -236,12 +238,16 @@ export default function Workouts() {
             className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
           />
 
-          <input
-            type="date"
-            value={workoutDate}
-            onChange={(e) => setWorkoutDate(e.target.value)}
-            className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
-          />
+          <div className="relative w-full">
+            <DatePicker
+              placeholderText="Date"
+              selected={workoutDate}
+              onChange={(date) => setWorkoutDate(date)}
+              className="border-2 border-gray-300 rounded-lg w-full p-2 focus:outline-none focus:border-blue-500"
+              wrapperClassName="w-full"
+              popperClassName="absolute z-50"
+            />
+          </div>
 
           <textarea
             placeholder="Notes (Optional)"
