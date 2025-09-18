@@ -27,8 +27,6 @@ export default function WorkoutDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newExerciseName, setNewExerciseName] = useState("");
 
-  const [val, setVal] = useState("");
-
   const [popupMessage, setPopupMessage] = useState(null);
 
   const showPopup = (text, type = "success") => {
@@ -207,21 +205,24 @@ export default function WorkoutDetails() {
       return;
     }
 
+    const invalidSet = exercise.sets.find(
+      (set) => isNaN(set.reps) || isNaN(set.weight)
+    );
+
+    if (invalidSet) {
+      showPopup("Only numbers, please", "error");
+      return; // 🚀 now it exits the whole function
+    }
+
     // Build payload
     const payload = {
       workoutExerciseId: exercise.workoutExerciseId,
-      sets: exercise.sets.map((set) => {
-        if (isNaN(set.reps) || isNaN(set.weight)) {
-          showPopup("Only numbers, please", "error");
-          return;
-        }
-        return {
-          ...(set.setId && { setId: set.setId }),
-          reps: set.reps,
-          weight: set.weight,
-          order: set.order,
-        };
-      }),
+      sets: exercise.sets.map((set) => ({
+        ...(set.setId && { setId: set.setId }),
+        reps: set.reps,
+        weight: set.weight,
+        order: set.order,
+      })),
     };
 
     try {
