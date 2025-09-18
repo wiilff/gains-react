@@ -353,7 +353,7 @@ export default function WorkoutDetails() {
               >
                 <input
                   type="number"
-                  inputmode="numeric"
+                  inputMode="numeric"
                   pattern="\d*"
                   value={set.reps}
                   placeholder="Reps"
@@ -369,7 +369,7 @@ export default function WorkoutDetails() {
                 />
                 <input
                   type="number"
-                  inputmode="numeric"
+                  inputMode="numeric"
                   pattern="\d*"
                   value={set.weight ?? ""}
                   placeholder="Weight"
