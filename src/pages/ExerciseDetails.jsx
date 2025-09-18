@@ -30,7 +30,7 @@ export default function ExeciseDetails() {
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen pt-16 pb-16 px-7">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
       {/* Header */}
       <Header
         title={exerciseDetails[0].exerciseName.toUpperCase()}

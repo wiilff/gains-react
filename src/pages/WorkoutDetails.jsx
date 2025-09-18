@@ -101,14 +101,13 @@ export default function WorkoutDetails() {
       const updatedWorkout = await getWorkoutDetails(id);
       setWorkoutDetails(updatedWorkout);
 
-      if(res.message) {
+      if (res.message) {
         showPopup(res.message, "error");
       } else {
         showPopup("Exercise added!", "success");
       }
-
     } catch (err) {
-      console.error(err)
+      console.error(err);
       showPopup("Something went wrong", "error");
     }
   };
@@ -171,7 +170,6 @@ export default function WorkoutDetails() {
     if (isPersisted) {
       try {
         const res = await deleteById(setId);
-
       } catch (error) {
         console.error("Error saving sets:", error);
       }
@@ -185,12 +183,11 @@ export default function WorkoutDetails() {
       const res = await getWorkoutDetails(id); // fetch fresh state
       setWorkoutDetails(res);
 
-      if(res.message) {
+      if (res.message) {
         showPopup(res.message, "error");
       } else {
         showPopup("Exercise removed!", "success");
       }
-
     } catch (err) {
       console.error(err);
       showPopup("Something went wrong", "error");
@@ -211,19 +208,25 @@ export default function WorkoutDetails() {
     // Build payload
     const payload = {
       workoutExerciseId: exercise.workoutExerciseId,
-      sets: exercise.sets.map((set) => ({
-        ...(set.setId && { setId: set.setId }),
-        reps: set.reps,
-        weight: set.weight,
-        order: set.order,
-      })),
+      sets: exercise.sets.map((set) => {
+        if (Number.isNaN(set.reps) || Number.isNaN(set.weight)) {
+          showPopup("Only numbers, please", "error");
+          return;
+        }
+        return {
+          ...(set.setId && { setId: set.setId }),
+          reps: set.reps,
+          weight: set.weight,
+          order: set.order,
+        };
+      }),
     };
 
     try {
       const res = await updateExerciseSets(payload);
       console.log(res);
 
-      if(res.message) {
+      if (res.message) {
         showPopup(res.message, "error");
       } else {
         showPopup("Sets saved!", "success");
@@ -255,7 +258,7 @@ export default function WorkoutDetails() {
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen pt-16 pb-16 px-7">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
       {/* Header */}
       <Header
         title={workoutDetails.name.toUpperCase()}
@@ -350,6 +353,8 @@ export default function WorkoutDetails() {
               >
                 <input
                   type="number"
+                  inputmode="numeric"
+                  pattern="\d*"
                   value={set.reps}
                   placeholder="Reps"
                   onChange={(e) =>
@@ -364,6 +369,8 @@ export default function WorkoutDetails() {
                 />
                 <input
                   type="number"
+                  inputmode="numeric"
+                  pattern="\d*"
                   value={set.weight ?? ""}
                   placeholder="Weight"
                   onChange={(e) =>
@@ -410,10 +417,7 @@ export default function WorkoutDetails() {
       </div>
 
       {popupMessage && (
-        <Popup
-          message={popupMessage}
-          onClose={() => setPopupMessage(null)}
-        />
+        <Popup message={popupMessage} onClose={() => setPopupMessage(null)} />
       )}
 
       {/*MODAL*/}
@@ -434,7 +438,6 @@ export default function WorkoutDetails() {
 
           <CreateButton className="w-full" title="Create exercise" />
         </form>
-
       </CreateWorkoutModal>
 
       {/* Bottom Navigation */}

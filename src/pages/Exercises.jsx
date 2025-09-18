@@ -39,7 +39,7 @@ export default function Exercises() {
   };
 
   return (
-    <div className="min-h-screen pt-16 pb-16 px-7">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
       {/* Header */}
       <Header
         title="LIGHT WEIGHT BABY"

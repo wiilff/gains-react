@@ -137,7 +137,7 @@ export default function Workouts() {
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 
-      <div className="px-7 mt-6">
+      <div className="px-7 mt-6 md:mx-20 lg:mx-50">
         <CreateButton
           className="w-full"
           title="Create a new workout"
