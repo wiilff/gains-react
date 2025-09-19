@@ -177,6 +177,11 @@ export default function WorkoutDetails() {
   };
 
   const removeExerciseFromWorkout = async (workoutExerciseId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to remove this exercise?"
+    );
+    if (!confirmed) return; 
+
     try {
       await deleteExerciseFromWorkout(workoutExerciseId);
 
@@ -355,7 +360,7 @@ export default function WorkoutDetails() {
                 className="flex gap-2 mb-2 items-center"
               >
                 <input
-                  type="number"
+                  type="text"
                   inputMode="numeric"
                   pattern="\d*"
                   value={set.reps}
@@ -371,7 +376,7 @@ export default function WorkoutDetails() {
                   className="border p-1 rounded w-20"
                 />
                 <input
-                  type="number"
+                  type="text"
                   inputMode="numeric"
                   pattern="\d*"
                   value={set.weight ?? ""}
