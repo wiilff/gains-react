@@ -407,14 +407,14 @@ export default function WorkoutDetails() {
             {/* Option to add a new set + Save Changes button */}
             <div className="mt-4 flex justify-between items-center">
               <button
-                className="text-blue-500 font-medium"
+                className="text-blue-500 font-medium hover:text-blue-600 active:scale-90 active:text-blue-700 transition transform duration-150 cursor-pointer"
                 onClick={() => addSet(exercise.workoutExerciseId)}
               >
                 + Add Set
               </button>
 
               <button
-                className="text-green-500 font-medium"
+                className="text-green-500 font-medium hover:text-green-600 active:scale-90 active:text-green-700 transition transform duration-150 cursor-pointer"
                 onClick={() => saveExerciseSets(exercise.workoutExerciseId)}
               >
                 Save changes
