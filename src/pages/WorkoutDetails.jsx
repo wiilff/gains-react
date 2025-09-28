@@ -13,7 +13,11 @@ import {
   deleteExerciseFromWorkout,
   deleteById,
 } from "../api/sets";
-import { getExercises, createExercise } from "../api/exercises";
+import {
+  getExercises,
+  createExercise,
+  getMuscleGroups,
+} from "../api/exercises";
 import { useEffect, useState } from "react";
 import CreateWorkoutModal from "../components/CreateWorkoutModal";
 
@@ -26,6 +30,8 @@ export default function WorkoutDetails() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newExerciseName, setNewExerciseName] = useState("");
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("");
+  const [muscleGroups, setMuscleGroups] = useState([]);
 
   const [popupMessage, setPopupMessage] = useState(null);
 
@@ -42,8 +48,11 @@ export default function WorkoutDetails() {
       try {
         const data = await getWorkoutDetails(id);
         const exercises = await getExercises();
+        const muscles = await getMuscleGroups();
         setAllExercises(exercises);
         setWorkoutDetails(data);
+        setMuscleGroups(muscles);
+        setSelectedMuscleGroup(muscles[0]);
       } catch (err) {
         console.error("Failed to fetch workout details", err);
       } finally {
@@ -64,7 +73,7 @@ export default function WorkoutDetails() {
     if (value.trim().length > 0) {
       setHasSearched(true);
       const filtered = allExercises.filter((exercise) =>
-        exercise.name.toLowerCase().includes(value.toLowerCase())
+        exercise.name?.toLowerCase().includes(value.toLowerCase())
       );
       setSearchResults(filtered);
     } else {
@@ -75,15 +84,23 @@ export default function WorkoutDetails() {
 
   const submitExercise = async (e) => {
     e.preventDefault();
+    
+    const exercise = {
+      name: newExerciseName,
+      muscleGroup: selectedMuscleGroup
+    }
 
     try {
-      const res = await createExercise(newExerciseName);
+      const res = await createExercise(exercise);
 
       if (res.message) {
         showPopup(res.message, "error");
       } else {
         setNewExerciseName("");
-        setIsModalOpen(false); // close modal immediately
+        setIsModalOpen(false);
+
+        await submitExerciseToWorkout(res.id);
+
         showPopup("Exercise created successfully!", "success");
       }
     } catch (err) {
@@ -95,7 +112,7 @@ export default function WorkoutDetails() {
   const submitExerciseToWorkout = async (exerciseId) => {
     try {
       const res = await postExerciseToWorkout({
-        workout_id: id,
+        workout_id: parseInt(id),
         exercise_id: exerciseId,
       });
       const updatedWorkout = await getWorkoutDetails(id);
@@ -115,17 +132,17 @@ export default function WorkoutDetails() {
   const handleSetChange = (workoutExerciseId, setIdentifier, field, value) => {
     setWorkoutDetails((prev) => ({
       ...prev,
-      exercises: prev.exercises.map((ex) =>
-        ex.workoutExerciseId === workoutExerciseId
+      workoutExercises: prev.workoutExercises.map((exercise) =>
+        exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...ex,
-              sets: ex.sets.map((set) =>
-                (set.setId || set.tempId) === setIdentifier
+              ...exercise,
+              sets: exercise.sets.map((set) =>
+                (set.id || set.tempId) === setIdentifier
                   ? { ...set, [field]: value }
                   : set
               ),
             }
-          : ex
+          : exercise
       ),
     }));
   };
@@ -133,45 +150,45 @@ export default function WorkoutDetails() {
   const addSet = (workoutExerciseId) => {
     setWorkoutDetails((prev) => ({
       ...prev,
-      exercises: prev.exercises.map((ex) =>
-        ex.workoutExerciseId === workoutExerciseId
+      workoutExercises: prev.workoutExercises.map((exercise) =>
+        exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...ex,
+              ...exercise,
               sets: [
-                ...(ex.sets || []),
+                ...(exercise.sets || []),
                 {
                   tempId: uuidv4(),
                   reps: "",
                   weight: "",
-                  order: (ex.sets?.length || 0) + 1,
+                  order: (exercise.sets?.length || 0) + 1,
                 },
               ],
             }
-          : ex
+          : exercise
       ),
     }));
   };
 
-  const deleteSet = async (workoutExerciseId, setId, isPersisted) => {
+  const deleteSet = async (workoutExerciseId, setIdentifier, isPersisted) => {
     setWorkoutDetails((prev) => ({
       ...prev,
-      exercises: prev.exercises.map((ex) =>
-        ex.workoutExerciseId === workoutExerciseId
+      workoutExercises: prev.workoutExercises.map((exercise) =>
+        exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...ex,
-              sets: ex.sets.filter(
-                (set) => (set.setId ?? set.tempId) !== setId
+              ...exercise,
+              sets: exercise.sets.filter(
+                (set) => (set.id || set.tempId) !== setIdentifier
               ),
             }
-          : ex
+          : exercise
       ),
     }));
 
     if (isPersisted) {
       try {
-        const res = await deleteById(setId);
+        await deleteById(setIdentifier);
       } catch (error) {
-        console.error("Error saving sets:", error);
+        console.error("Error deleting set:", error);
       }
     }
   };
@@ -180,7 +197,7 @@ export default function WorkoutDetails() {
     const confirmed = window.confirm(
       "Are you sure you want to remove this exercise?"
     );
-    if (!confirmed) return; 
+    if (!confirmed) return;
 
     try {
       await deleteExerciseFromWorkout(workoutExerciseId);
@@ -200,8 +217,7 @@ export default function WorkoutDetails() {
   };
 
   const saveExerciseSets = async (workoutExerciseId) => {
-    // Find the exercise in state
-    const exercise = workoutDetails.exercises.find(
+    const exercise = workoutDetails.workoutExercises.find(
       (ex) => ex.workoutExerciseId === workoutExerciseId
     );
 
@@ -210,53 +226,52 @@ export default function WorkoutDetails() {
       return;
     }
 
+    // Validate numbers
     const invalidSet = exercise.sets.find(
       (set) => isNaN(set.reps) || isNaN(set.weight)
     );
-
     if (invalidSet) {
       showPopup("Only numbers, please", "error");
-      return; // 🚀 now it exits the whole function
+      return;
     }
 
-    // Build payload
-    const payload = {
-      workoutExerciseId: exercise.workoutExerciseId,
-      sets: exercise.sets.map((set) => ({
-        ...(set.setId && { setId: set.setId }),
-        reps: set.reps,
-        weight: set.weight,
-        order: set.order,
-      })),
-    };
+    const now = new Date().toISOString();
+    console.log(now);
+
+    const payload = exercise.sets.map((set, index) => ({
+      id: set.id,
+      reps: parseFloat(set.reps),
+      weight: parseFloat(set.weight),
+      order: index + 1,
+      loggedAt: now
+    }));
 
     try {
-      const res = await updateExerciseSets(payload);
-      console.log(res);
+      const res = await updateExerciseSets(exercise.workoutExerciseId, payload);
 
       if (res.message) {
         showPopup(res.message, "error");
-      } else {
-        showPopup("Sets saved!", "success");
+        return;
       }
 
       const updatedSets = res.map((s) => ({
-        setId: s._id,
+        id: s.id,
         reps: s.reps,
         weight: s.weight,
-        order: s.order,
+        order: s.setOrder,
         workoutExerciseId: s.workoutExerciseId,
       }));
 
-      // overwrite exercise sets in state
       setWorkoutDetails((prev) => ({
         ...prev,
-        exercises: prev.exercises.map((ex) =>
+        workoutExercises: prev.workoutExercises.map((ex) =>
           ex.workoutExerciseId === workoutExerciseId
             ? { ...ex, sets: updatedSets }
             : ex
         ),
       }));
+
+      showPopup("Sets saved!", "success");
     } catch (error) {
       console.error("Error saving sets:", error);
       showPopup("Something went wrong", "error");
@@ -269,7 +284,7 @@ export default function WorkoutDetails() {
     <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
       {/* Header */}
       <Header
-        title={workoutDetails.name.toUpperCase()}
+        title={workoutDetails.workoutName.toUpperCase()}
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 
@@ -297,16 +312,16 @@ export default function WorkoutDetails() {
             // Filter out exercises already in the workout by name
             .filter(
               (exercise) =>
-                !workoutDetails.exercises.some(
+                !workoutDetails.workoutExercises.some(
                   (ex) => ex.name.toLowerCase() === exercise.name.toLowerCase()
                 )
             )
             .slice(0, 5)
             .map((exercise) => (
               <div
-                key={exercise._id}
+                key={exercise.id}
                 className="bg-white p-4 rounded-lg shadow hover:shadow-md flex items-center justify-between cursor-pointer"
-                onClick={() => submitExerciseToWorkout(exercise._id)}
+                onClick={() => submitExerciseToWorkout(exercise.id)}
               >
                 <div className="flex items-center space-x-3">
                   <Dumbbell className="text-blue-500" />
@@ -332,7 +347,7 @@ export default function WorkoutDetails() {
 
       {/* Exercises Section */}
       <div className="mt-6 space-y-4">
-        {workoutDetails.exercises.map((exercise) => (
+        {workoutDetails.workoutExercises.map((exercise) => (
           <div
             key={exercise.workoutExerciseId}
             className="bg-white p-4 rounded-xl shadow-md"
@@ -356,7 +371,7 @@ export default function WorkoutDetails() {
             {/* Sets */}
             {exercise.sets?.map((set) => (
               <div
-                key={set.setId || set.tempId}
+                key={set.id || set.tempId}
                 className="flex gap-2 mb-2 items-center"
               >
                 <input
@@ -368,7 +383,7 @@ export default function WorkoutDetails() {
                   onChange={(e) =>
                     handleSetChange(
                       exercise.workoutExerciseId,
-                      set.setId || set.tempId,
+                      set.id || set.tempId,
                       "reps",
                       e.target.value
                     )
@@ -384,7 +399,7 @@ export default function WorkoutDetails() {
                   onChange={(e) =>
                     handleSetChange(
                       exercise.workoutExerciseId,
-                      set.setId || set.tempId,
+                      set.id || set.tempId,
                       "weight",
                       e.target.value
                     )
@@ -396,8 +411,8 @@ export default function WorkoutDetails() {
                   onClick={() =>
                     deleteSet(
                       exercise.workoutExerciseId,
-                      set.setId ?? set.tempId,
-                      Boolean(set.setId)
+                      set.id || set.tempId,
+                      Boolean(set.id)
                     )
                   }
                 />
@@ -443,6 +458,18 @@ export default function WorkoutDetails() {
             onChange={(e) => setNewExerciseName(e.target.value)}
             className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
           />
+
+          <select
+            value={selectedMuscleGroup}
+            onChange={(e) => setSelectedMuscleGroup(e.target.value)}
+            className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
+          >
+            {muscleGroups.map((mg, index) => (
+              <option key={index} value={mg}>
+                {mg}
+              </option>
+            ))}
+          </select>
 
           <CreateButton className="w-full" title="Create exercise" />
         </form>

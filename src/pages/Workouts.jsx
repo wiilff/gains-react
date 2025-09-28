@@ -7,6 +7,7 @@ import {
   updateWorkout,
   deleteWorkout,
 } from "../api/workouts";
+import { getMuscleGroups } from "../api/exercises";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/Nav";
 import Header from "../components/Header";
@@ -31,6 +32,7 @@ export default function Workouts() {
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDate, setWorkoutDate] = useState("");
   const [workoutNotes, setWorkoutNotes] = useState("");
+  const [shared, setShared] = useState(false);
 
   const [popupMessage, setPopupMessage] = useState(null);
 
@@ -43,7 +45,8 @@ export default function Workouts() {
   const openEditModal = (workout) => {
     setEditingWorkout(workout);
     setWorkoutName(workout.name);
-    setWorkoutDate(workout.date.slice(0, 10));
+    setWorkoutDate(workout.date);
+    setShared(workout.shared);
     setWorkoutNotes(workout.notes || "");
     setIsModalOpen(true);
   };
@@ -52,6 +55,7 @@ export default function Workouts() {
     setWorkoutName("");
     setWorkoutDate("");
     setWorkoutNotes("");
+    setShared(false);
     setIsModalOpen(false);
   };
 
@@ -73,15 +77,22 @@ export default function Workouts() {
   const submitWorkout = async (e) => {
     e.preventDefault();
 
+    const year = workoutDate.getFullYear();
+    const month = workoutDate.getMonth();
+    const day = workoutDate.getDate();
+
+    const utcDate = new Date(Date.UTC(year, month, day, 12, 0, 0));
+
     const workout = {
       name: workoutName,
-      date: workoutDate,
+      date: utcDate.toISOString(),
+      isShared: shared,
       notes: workoutNotes,
     };
 
     try {
       if (editingWorkout) {
-        const res = await updateWorkout(editingWorkout._id, workout);
+        const res = await updateWorkout(editingWorkout.id, workout);
         if (res.message) {
           showPopup(res.message, "error");
         } else {
@@ -89,13 +100,14 @@ export default function Workouts() {
 
           setWorkouts((prevWorkouts) =>
             prevWorkouts.map((w) =>
-              w._id === editingWorkout._id ? { ...w, ...res } : w
+              w.id === editingWorkout.id ? { ...w, ...res } : w
             )
           );
         }
       } else {
+        console.log(workout);
         const res = await createWorkout(workout);
-        navigate(`/workout/${res._id}`);
+        navigate(`/workout/${res.id}`);
       }
 
       setWorkoutName("");
@@ -121,7 +133,7 @@ export default function Workouts() {
         showPopup(res.message, "error");
       } else {
         showPopup("Workout deleted!", "success");
-        setWorkouts((prevWorkouts) => prevWorkouts.filter((w) => w._id !== id));
+        setWorkouts((prevWorkouts) => prevWorkouts.filter((w) => w.id !== id));
       }
     } catch (err) {
       console.error(err);
@@ -155,9 +167,9 @@ export default function Workouts() {
         <div className="space-y-4">
           {workouts.map((workout) => (
             <div
-              key={workout._id}
+              key={workout.id}
               className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition cursor-pointer"
-              onClick={() => navigate(`/workout/${workout._id}`)}
+              onClick={() => navigate(`/workout/${workout.id}`)}
             >
               {/* Top: Title and Chevron */}
               <div className="flex items-center justify-between mb-2">
@@ -198,7 +210,7 @@ export default function Workouts() {
                     className="text-red-500 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDeleteWorkout(workout._id);
+                      handleDeleteWorkout(workout.id);
                     }}
                   />
                 </div>
@@ -248,6 +260,13 @@ export default function Workouts() {
               popperClassName="absolute z-50"
             />
           </div>
+
+          <input
+            type="checkbox"
+            checked={shared}
+            onChange={(e) => setShared(e.target.checked)}
+          />
+          <label>Share with friends</label>
 
           <textarea
             placeholder="Notes (Optional)"

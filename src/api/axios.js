@@ -2,12 +2,12 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL
 
-let accessToken = null
-
+let accessToken = localStorage.getItem("accessToken") || null;
 
 export const setAccessToken = (token) => {
-    accessToken = token;
-}
+  accessToken = token;
+  localStorage.setItem("accessToken", token);
+};
 
 const api = axios.create({
     baseURL: API_URL,
@@ -27,21 +27,19 @@ api.interceptors.response.use((response) => response, async (error) => {
         originalRequest._retry = true;
 
         try {
-            const res = await axios.post(
-                `${API_URL}/api/user/auth/refresh`,
-                {},
-                { withCredentials: true }
-            );
+            const res = await api.post("/api/auth/refresh", null);
 
-            const newAccessToken = res.data.access_token;
+            const newAccessToken = res.data.token;
             setAccessToken(newAccessToken);
 
             originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+            
             return api(originalRequest);
 
         } catch(err) {
-            console.log("Refresh token failed");
-            //handle logout
+            setAccessToken(null);
+            window.location.href = "/login"
+            return Promise.reject(err);
         }
     }
     return Promise.reject(error);

@@ -27,6 +27,7 @@ export default function Login() {
       console.error(err);
 
       alert(`${isRegister ? "Register" : "Login"} failed`);
+      navigate("/login")
     }
   };
 
