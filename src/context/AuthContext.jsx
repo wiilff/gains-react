@@ -69,8 +69,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const deleteAccount = async () => {
+    setLoading(true);
+    try {
+      await api.delete("/api/auth");
+    } catch (err) {
+      console.error("Account deletion failed", err);
+    } finally {
+      setAccessToken(null);
+      setUser(null);
+      setLoading(false);
+      navigate("/login");
+    }
+  }
+
+  const updateAccount = async (data) => {
+    setLoading(true);
+    try {
+      const res = await api.put("/api/auth", data);
+      setUser(res.data.email);
+      setAccessToken(res.data.token);
+    } catch (err) {
+      console.error("Account update failed", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, deleteAccount, updateAccount, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -17,9 +17,11 @@ import CoreButton from "../components/CoreButton";
 import { useNavigate } from "react-router-dom";
 
 import { Trash2, RefreshCw } from "lucide-react";
+import CreateWorkoutModal from "../components/CreateWorkoutModal";
+import Popup from "../components/Popup";
 
 export default function Profile() {
-  const { logout, user } = useAuth();
+  const { logout, user, updateAccount, deleteAccount } = useAuth();
   const [profileData, setProfileData] = useState([]);
 
   const navigate = useNavigate();
@@ -30,11 +32,35 @@ export default function Profile() {
   const [muscleGroupFilter, setMuscleGroupFilter] = useState("weekly");
   const [muscleGroups, setMuscleGroups] = useState([]);
 
+  const [popupMessage, setPopupMessage] = useState(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const openEditModal = () => {
+    setUsername(username);
+    setEmail(email);
+    setPassword("");
+    setIsModalOpen(true);
+  }
+
+
+  const showPopup = (text, type = "success") => {
+    setPopupMessage({ text, type });
+  };
+
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await getProfileData();
       setProfileData(res);
-
+      const userData = await getMe();
+      console.log("User data:", userData);
+      setUsername(userData.name);
+      setEmail(userData.email);
     };
 
     fetchData();
@@ -53,6 +79,25 @@ export default function Profile() {
     setMuscleGroups(muscleGroupsWorked);
 
   }, [profileData, timeSpentFilter, muscleGroupFilter]);
+
+  const updateUser = async (e) => {
+    e.preventDefault();
+
+    const updatedUser = {
+      name: username,
+      email: email,
+      password: password,
+    }
+
+    try {
+      await updateAccount(updatedUser);
+      
+      showPopup("Profile updated successfully!", "success");
+    } catch (err) {
+      console.error("Failed to update user:", err);
+      showPopup("Failed to update profile.", "error");
+    }
+  }
 
   if (!profileData) return <Loading></Loading>;
 
@@ -106,20 +151,63 @@ export default function Profile() {
       <CoreButton
         title="Edit Profile"
         className="w-full mt-4 bg-yellow-500"
-        onClick={() => alert("Change password functionality not implemented yet.")}
-        Icon={ RefreshCw }
+        onClick={(e) => {
+          e.stopPropagation();
+          openEditModal();
+        }}
+        Icon={RefreshCw}
       />
 
       <CoreButton
         title="Delete Account"
         className="w-full mt-4 bg-red-500"
         onClick={() => alert("Delete account functionality not implemented yet.")}
-        Icon={ Trash2 }
+        Icon={Trash2}
       />
 
 
       {/* Bottom Navigation */}
       <BottomNav currPage={"Profile"} />
+
+
+      {/* Modal */}
+      <CreateWorkoutModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={"Edit Profile"}
+      >
+        <form className="space-y-4" onSubmit={updateUser}>
+
+          <input
+            type="text"
+            placeholder="Name"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
+          />
+
+
+
+          <CoreButton
+            className="w-full"
+            title={"Save Changes"}
+          />
+        </form>
+      </CreateWorkoutModal>
     </div>
   );
 }
