@@ -2,7 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import CreateButton from "../components/CreateButton";
+import CoreButton from "../components/CoreButton";
 
 export default function Login() {
   const { login, register } = useAuth();
@@ -66,7 +66,7 @@ export default function Login() {
             className="border-2 border-gray-300 rounded-lg w-full p-2 focus:outline-none focus:border-blue-500"
           />
 
-          <CreateButton
+          <CoreButton
             type="submit"
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition"
             title={isRegister ? "Register" : "Login"}

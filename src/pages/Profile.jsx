@@ -1,5 +1,4 @@
 import { useAuth } from "../context/AuthContext";
-import CreateButton from "../components/CreateButton";
 import Header from "../components/Header";
 import Me from "../components/Me";
 import BottomNav from "../components/Nav";
@@ -14,10 +13,16 @@ import {
 } from "../utils/graphCalculations";
 import { TinyBarChart } from "../components/charts/TinyBarChartComponent";
 import Friends from "../components/Friends";
+import CoreButton from "../components/CoreButton";
+import { useNavigate } from "react-router-dom";
+
+import { Trash2, RefreshCw } from "lucide-react";
 
 export default function Profile() {
   const { logout, user } = useAuth();
   const [profileData, setProfileData] = useState([]);
+
+  const navigate = useNavigate();
 
   const [timeSpentFilter, setTimeSpentFilter] = useState("weekly");
   const [timeSpent, setTimeSpent] = useState([]);
@@ -61,7 +66,14 @@ export default function Profile() {
 
       <Me user={user} />
 
-      {/* Time Spent Chart */}
+      <CoreButton
+        title="Your Splits"
+        className="w-full mt-4"
+        onClick={() => navigate("/splits")}
+      />
+
+      {/*  
+
       <ChartCard
         title="Time Spent in Gym"
         onFilterChange={(filter) => setTimeSpentFilter(filter)}
@@ -69,7 +81,8 @@ export default function Profile() {
         <TinyBarChart data={timeSpent} xKey="date" yKey="minutes" />
       </ChartCard>
 
-      {/* Muscle Group Chart */}
+      */}
+
       <ChartCard
         title="Muscle Groups worked"
         onFilterChange={(filter) => setMuscleGroupFilter(filter)}
@@ -77,15 +90,33 @@ export default function Profile() {
         <TinyBarChart data={muscleGroups} xKey="muscleGroup" yKey="count" />
       </ChartCard>
 
+      {/*  
       <Friends />
-
       <Feed />
+      */}
 
-      <CreateButton
+
+
+      <CoreButton
         title="Logout"
         className="w-full mt-4"
         onClick={() => logout()}
       />
+
+      <CoreButton
+        title="Edit Profile"
+        className="w-full mt-4 bg-yellow-500"
+        onClick={() => alert("Change password functionality not implemented yet.")}
+        Icon={ RefreshCw }
+      />
+
+      <CoreButton
+        title="Delete Account"
+        className="w-full mt-4 bg-red-500"
+        onClick={() => alert("Delete account functionality not implemented yet.")}
+        Icon={ Trash2 }
+      />
+
 
       {/* Bottom Navigation */}
       <BottomNav currPage={"Profile"} />

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/Nav";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
-import CreateButton from "../components/CreateButton";
+import CoreButton from "../components/CoreButton";
 import Popup from "../components/Popup";
 import { v4 as uuidv4 } from "uuid";
 import { Dumbbell, Eye, Trash2, Search, X } from "lucide-react";
@@ -104,7 +104,7 @@ export default function WorkoutDetails() {
         showPopup("Exercise created successfully!", "success");
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       showPopup("Something went wrong", "error");
     }
   };
@@ -236,7 +236,7 @@ export default function WorkoutDetails() {
     }
 
     const now = new Date().toISOString();
-    console.log(now);
+    
 
     const payload = exercise.sets.map((set, index) => ({
       id: set.id,
@@ -336,7 +336,7 @@ export default function WorkoutDetails() {
 
         {hasSearched && searchResults.length === 0 ? (
           <div>
-            <CreateButton
+            <CoreButton
               title="Exercise missing? Add it here"
               className="w-full"
               onClick={() => setIsModalOpen(true)}
@@ -471,7 +471,7 @@ export default function WorkoutDetails() {
             ))}
           </select>
 
-          <CreateButton className="w-full" title="Create exercise" />
+          <CoreButton className="w-full" title="Create exercise" />
         </form>
       </CreateWorkoutModal>
 

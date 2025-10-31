@@ -6,7 +6,7 @@ export const getExercises = async () => {
 };
 
 export const createExercise = async (data) => {
-  console.log(data)
+
   const res = await api.post(`/api/exercises`, data )
   return res.data;
 };

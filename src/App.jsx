@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
 import { AuthProvider } from "./context/AuthContext";
+import SplitPage from "./pages/SplitPage";
 
 export default function App() {
   return (
@@ -64,6 +65,15 @@ export default function App() {
           element={
             <PrivateRoute>
               <Profile />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/splits"
+          element={
+            <PrivateRoute>
+              <SplitPage />
             </PrivateRoute>
           }
         />

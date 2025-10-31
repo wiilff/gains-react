@@ -10,15 +10,15 @@ export default function ChartCard({ title, children, onFilterChange }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 mb-6 text-center">
+    <div className="mt-4 bg-white rounded-xl shadow-md p-4 mb-6 text-center">
       {/* Title */}
-      <h3 className="text-gray-700 font-semibold text-lg mb-3 w-full">{title}</h3>
+      <h3 className="text-black font-semibold text-lg mb-3 w-full">{title}</h3>
 
       {/* Switch */}
-      <div className="flex w-full border rounded-full overflow-hidden mb-4">
+      <div className="flex w-full border rounded-full border-blue-600 overflow-hidden mb-4">
         <button
           className={`flex-1 py-1 text-center transition-colors ${
-            filter === "weekly" ? "bg-gray-200 text-black" : "bg-white"
+            filter === "weekly" ? "bg-blue-600 font-semibold text-white" : "bg-white font-semibold"
           }`}
           onClick={() => handleChange("weekly")}
         >
@@ -26,7 +26,7 @@ export default function ChartCard({ title, children, onFilterChange }) {
         </button>
         <button
           className={`flex-1 py-1 text-center transition-colors ${
-            filter === "monthly" ? "bg-gray-200 text-black" : "bg-white"
+            filter === "monthly" ? "bg-blue-600 font-semibold text-white" : "bg-white font-semibold"
           }`}
           onClick={() => handleChange("monthly")}
         >
@@ -35,7 +35,7 @@ export default function ChartCard({ title, children, onFilterChange }) {
       </div>
 
       {/* Chart */}
-      <div>{children}</div>
+      <div className="mt-10">{children}</div>
     </div>
   );
 }
