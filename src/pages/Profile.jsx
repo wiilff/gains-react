@@ -58,7 +58,6 @@ export default function Profile() {
       const res = await getProfileData();
       setProfileData(res);
       const userData = await getMe();
-      console.log("User data:", userData);
       setUsername(userData.name);
       setEmail(userData.email);
     };
@@ -81,7 +80,8 @@ export default function Profile() {
   }, [profileData, timeSpentFilter, muscleGroupFilter]);
 
   const updateUser = async (e) => {
-    e.preventDefault();
+
+    if(e) e.preventDefault();
 
     const updatedUser = {
       name: username,
@@ -91,7 +91,7 @@ export default function Profile() {
 
     try {
       await updateAccount(updatedUser);
-      
+
       showPopup("Profile updated successfully!", "success");
     } catch (err) {
       console.error("Failed to update user:", err);
@@ -161,9 +161,13 @@ export default function Profile() {
       <CoreButton
         title="Delete Account"
         className="w-full mt-4 bg-red-500"
-        onClick={() => alert("Delete account functionality not implemented yet.")}
+        onClick={() => deleteAccount()}
         Icon={Trash2}
       />
+
+      {popupMessage && (
+        <Popup message={popupMessage} onClose={() => setPopupMessage(null)} />
+      )}
 
 
       {/* Bottom Navigation */}
@@ -176,7 +180,7 @@ export default function Profile() {
         onClose={() => setIsModalOpen(false)}
         title={"Edit Profile"}
       >
-        <form className="space-y-4" onSubmit={updateUser}>
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
 
           <input
             type="text"
@@ -205,6 +209,7 @@ export default function Profile() {
           <CoreButton
             className="w-full"
             title={"Save Changes"}
+            onClick={updateUser}
           />
         </form>
       </CreateWorkoutModal>

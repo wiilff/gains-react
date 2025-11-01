@@ -27,6 +27,8 @@ export const AuthProvider = ({ children }) => {
     tryRefresh();
   }, []);
 
+  if (loading) return <Loading />;
+
   const login = async (email, password) => {
     setLoading(true);
     try {

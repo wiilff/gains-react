@@ -1,4 +1,4 @@
-// ...existing code...
+
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -24,7 +24,7 @@ const authApi = axios.create({
     baseURL: API_URL,
     withCredentials: true
 });
-// ...existing code...
+
 api.interceptors.request.use((config) => {
     if(accessToken) {
         config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -35,7 +35,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use((response) => response, async (error) => {
     const originalRequest = error.config;
     // if the failing request is the refresh endpoint, don't try to refresh again
-    if (originalRequest?.url?.includes('/auth/refresh')) {
+    if (originalRequest?.url?.includes('/api/auth/refresh')) {
         return Promise.reject(error);
     }
 
@@ -63,4 +63,3 @@ api.interceptors.response.use((response) => response, async (error) => {
 })
 
 export default api;
-// ...existing code...
