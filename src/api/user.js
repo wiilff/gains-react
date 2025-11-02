@@ -1,9 +1,7 @@
-import api, { setAccessToken } from "./api";
+import api from "../api/axios";
 
-export const login = async (email, password) => {
-  const res = await api.post("/login", { email, password });
-  const { accessToken } = res.data;
-
-  setAccessToken(accessToken);
-  
+export const getUserProfile = async () => {
+  const res = await api.get("/api/user/stats");
+  return res.data;
 };
+

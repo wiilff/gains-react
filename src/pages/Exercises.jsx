@@ -14,7 +14,7 @@ export default function Exercises() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getExerciseStats();
-      console.log(data);
+      
       setExercises(data);
     };
 

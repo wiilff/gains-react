@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/Nav";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
-import CreateButton from "../components/CreateButton";
+import CoreButton from "../components/CoreButton";
 import Popup from "../components/Popup";
 import { v4 as uuidv4 } from "uuid";
 import { Dumbbell, Eye, Trash2, Search, X } from "lucide-react";
@@ -84,7 +84,7 @@ export default function WorkoutDetails() {
 
   const submitExercise = async (e) => {
     e.preventDefault();
-    
+
     const exercise = {
       name: newExerciseName,
       muscleGroup: selectedMuscleGroup
@@ -104,7 +104,7 @@ export default function WorkoutDetails() {
         showPopup("Exercise created successfully!", "success");
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       showPopup("Something went wrong", "error");
     }
   };
@@ -114,6 +114,7 @@ export default function WorkoutDetails() {
       const res = await postExerciseToWorkout({
         workout_id: parseInt(id),
         exercise_id: exerciseId,
+        order: workoutDetails.workoutExercises.length + 1,
       });
       const updatedWorkout = await getWorkoutDetails(id);
       setWorkoutDetails(updatedWorkout);
@@ -135,13 +136,13 @@ export default function WorkoutDetails() {
       workoutExercises: prev.workoutExercises.map((exercise) =>
         exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...exercise,
-              sets: exercise.sets.map((set) =>
-                (set.id || set.tempId) === setIdentifier
-                  ? { ...set, [field]: value }
-                  : set
-              ),
-            }
+            ...exercise,
+            sets: exercise.sets.map((set) =>
+              (set.id || set.tempId) === setIdentifier
+                ? { ...set, [field]: value }
+                : set
+            ),
+          }
           : exercise
       ),
     }));
@@ -153,17 +154,17 @@ export default function WorkoutDetails() {
       workoutExercises: prev.workoutExercises.map((exercise) =>
         exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...exercise,
-              sets: [
-                ...(exercise.sets || []),
-                {
-                  tempId: uuidv4(),
-                  reps: "",
-                  weight: "",
-                  order: (exercise.sets?.length || 0) + 1,
-                },
-              ],
-            }
+            ...exercise,
+            sets: [
+              ...(exercise.sets || []),
+              {
+                tempId: uuidv4(),
+                reps: "",
+                weight: "",
+                order: (exercise.sets?.length || 0) + 1,
+              },
+            ],
+          }
           : exercise
       ),
     }));
@@ -175,11 +176,11 @@ export default function WorkoutDetails() {
       workoutExercises: prev.workoutExercises.map((exercise) =>
         exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...exercise,
-              sets: exercise.sets.filter(
-                (set) => (set.id || set.tempId) !== setIdentifier
-              ),
-            }
+            ...exercise,
+            sets: exercise.sets.filter(
+              (set) => (set.id || set.tempId) !== setIdentifier
+            ),
+          }
           : exercise
       ),
     }));
@@ -227,21 +228,24 @@ export default function WorkoutDetails() {
     }
 
     // Validate numbers
-    const invalidSet = exercise.sets.find(
-      (set) => isNaN(set.reps) || isNaN(set.weight)
-    );
+    const invalidSet = exercise.sets.find((set) => {
+      const reps = String(set.reps).replace(",", ".");
+      const weight = String(set.weight).replace(",", ".");
+      return isNaN(reps) || isNaN(weight);
+    });
+
     if (invalidSet) {
       showPopup("Only numbers, please", "error");
       return;
     }
 
     const now = new Date().toISOString();
-    console.log(now);
+
 
     const payload = exercise.sets.map((set, index) => ({
       id: set.id,
-      reps: parseFloat(set.reps),
-      weight: parseFloat(set.weight),
+      reps: Number(String(set.reps).replace(",", ".")),
+      weight: Number(String(set.weight).replace(",", ".")),
       order: index + 1,
       loggedAt: now
     }));
@@ -336,7 +340,7 @@ export default function WorkoutDetails() {
 
         {hasSearched && searchResults.length === 0 ? (
           <div>
-            <CreateButton
+            <CoreButton
               title="Exercise missing? Add it here"
               className="w-full"
               onClick={() => setIsModalOpen(true)}
@@ -376,8 +380,8 @@ export default function WorkoutDetails() {
               >
                 <input
                   type="text"
-                  inputMode="numeric"
-                  pattern="\d*"
+                  inputMode="decimal"
+                  pattern="[0-9]*[.,]?[0-9]*"
                   value={set.reps}
                   placeholder="Reps"
                   onChange={(e) =>
@@ -392,8 +396,8 @@ export default function WorkoutDetails() {
                 />
                 <input
                   type="text"
-                  inputMode="numeric"
-                  pattern="\d*"
+                  inputMode="decimal"
+                  pattern="[0-9]*[.,]?[0-9]*"
                   value={set.weight ?? ""}
                   placeholder="Weight"
                   onChange={(e) =>
@@ -471,7 +475,7 @@ export default function WorkoutDetails() {
             ))}
           </select>
 
-          <CreateButton className="w-full" title="Create exercise" />
+          <CoreButton className="w-full" title="Create exercise" />
         </form>
       </CreateWorkoutModal>
 

@@ -7,11 +7,10 @@ import {
   updateWorkout,
   deleteWorkout,
 } from "../api/workouts";
-import { getMuscleGroups } from "../api/exercises";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/Nav";
 import Header from "../components/Header";
-import CreateButton from "../components/CreateButton";
+import CoreButton from "../components/CoreButton";
 import CreateWorkoutModal from "../components/CreateWorkoutModal";
 import Loading from "../components/Loading";
 import Popup from "../components/Popup";
@@ -30,7 +29,7 @@ export default function Workouts() {
   const navigate = useNavigate();
 
   const [workoutName, setWorkoutName] = useState("");
-  const [workoutDate, setWorkoutDate] = useState("");
+  const [workoutDate, setWorkoutDate] = useState(new Date());
   const [workoutNotes, setWorkoutNotes] = useState("");
   const [shared, setShared] = useState(false);
 
@@ -45,7 +44,11 @@ export default function Workouts() {
   const openEditModal = (workout) => {
     setEditingWorkout(workout);
     setWorkoutName(workout.name);
-    setWorkoutDate(workout.date);
+    if (workout.date) {
+      setWorkoutDate(new Date(workout.date));
+    } else {
+      setWorkoutDate(new Date());
+    }
     setShared(workout.shared);
     setWorkoutNotes(workout.notes || "");
     setIsModalOpen(true);
@@ -53,7 +56,7 @@ export default function Workouts() {
 
   const clearModal = () => {
     setWorkoutName("");
-    setWorkoutDate("");
+    setWorkoutDate(new Date());
     setWorkoutNotes("");
     setShared(false);
     setIsModalOpen(false);
@@ -77,9 +80,18 @@ export default function Workouts() {
   const submitWorkout = async (e) => {
     e.preventDefault();
 
-    const year = workoutDate.getFullYear();
-    const month = workoutDate.getMonth();
-    const day = workoutDate.getDate();
+    // ensure we have a valid Date object
+    const dateObj =
+      workoutDate instanceof Date ? workoutDate : new Date(workoutDate);
+
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      showPopup("Please pick a valid date", "error");
+      return;
+    }
+
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth();
+    const day = dateObj.getDate();
 
     const utcDate = new Date(Date.UTC(year, month, day, 12, 0, 0));
 
@@ -105,7 +117,7 @@ export default function Workouts() {
           );
         }
       } else {
-        console.log(workout);
+        console.log("Creating workout:", workout);
         const res = await createWorkout(workout);
         navigate(`/workout/${res.id}`);
       }
@@ -152,7 +164,7 @@ export default function Workouts() {
       />
 
       <div className="px-7 mt-6 md:mx-20 lg:mx-50">
-        <CreateButton
+        <CoreButton
           className="w-full"
           title="Create a new workout"
           onClick={() => setIsModalOpen(true)}
@@ -261,12 +273,14 @@ export default function Workouts() {
             />
           </div>
 
+          {/* 
           <input
             type="checkbox"
             checked={shared}
             onChange={(e) => setShared(e.target.checked)}
           />
           <label>Share with friends</label>
+          */}
 
           <textarea
             placeholder="Notes (Optional)"
@@ -275,9 +289,10 @@ export default function Workouts() {
             className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
           ></textarea>
 
-          <CreateButton
+          <CoreButton
             className="w-full"
             title={editingWorkout ? "Save Changes" : "Create Workout"}
+            type="submit"
           />
         </form>
       </CreateWorkoutModal>
