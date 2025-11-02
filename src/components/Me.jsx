@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function Me({ user }) {
   if (!user) return null;
-
+  
   const [profileStats, setProfileStats] = useState({});
 
   useState(() => {
@@ -33,8 +33,8 @@ export default function Me({ user }) {
           />
         </div>
         <div className="flex flex-col">
-          <h2 className="text-lg font-semibold text-gray-800">{user}</h2>
-          <p className="text-gray-500 text-sm">{user}</p>
+          <h2 className="text-lg font-semibold text-gray-800">{user.username}</h2>
+          <p className="text-gray-500 text-sm">{user.email}</p>
         </div>
       </div>
 
@@ -45,8 +45,8 @@ export default function Me({ user }) {
           <p className="font-semibold text-gray-800">{profileStats.totalWorkouts}</p>
         </div>
         <div className="flex flex-col items-center justify-center">
-          <p className="text-gray-500 text-sm truncate">Consecutive Weeks</p>
-          <p className="font-semibold text-gray-800">{profileStats.consecutiveWeeks}</p>
+          <p className="text-gray-500 text-sm truncate">Exercises</p>
+          <p className="font-semibold text-gray-800">{profileStats.totalExercises}</p>
         </div>
         <div className="flex flex-col items-center justify-center">
           <p className="text-gray-500 text-sm truncate">Sets</p>

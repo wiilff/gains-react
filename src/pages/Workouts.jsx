@@ -29,7 +29,7 @@ export default function Workouts() {
   const navigate = useNavigate();
 
   const [workoutName, setWorkoutName] = useState("");
-  const [workoutDate, setWorkoutDate] = useState("");
+  const [workoutDate, setWorkoutDate] = useState(new Date());
   const [workoutNotes, setWorkoutNotes] = useState("");
   const [shared, setShared] = useState(false);
 
@@ -44,7 +44,11 @@ export default function Workouts() {
   const openEditModal = (workout) => {
     setEditingWorkout(workout);
     setWorkoutName(workout.name);
-    setWorkoutDate(workout.date);
+    if (workout.date) {
+      setWorkoutDate(new Date(workout.date));
+    } else {
+      setWorkoutDate(new Date());
+    }
     setShared(workout.shared);
     setWorkoutNotes(workout.notes || "");
     setIsModalOpen(true);
@@ -52,7 +56,7 @@ export default function Workouts() {
 
   const clearModal = () => {
     setWorkoutName("");
-    setWorkoutDate("");
+    setWorkoutDate(new Date());
     setWorkoutNotes("");
     setShared(false);
     setIsModalOpen(false);
@@ -113,7 +117,7 @@ export default function Workouts() {
           );
         }
       } else {
-
+        console.log("Creating workout:", workout);
         const res = await createWorkout(workout);
         navigate(`/workout/${res.id}`);
       }
@@ -288,6 +292,7 @@ export default function Workouts() {
           <CoreButton
             className="w-full"
             title={editingWorkout ? "Save Changes" : "Create Workout"}
+            type="submit"
           />
         </form>
       </CreateWorkoutModal>

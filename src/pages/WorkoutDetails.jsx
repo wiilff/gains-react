@@ -114,6 +114,7 @@ export default function WorkoutDetails() {
       const res = await postExerciseToWorkout({
         workout_id: parseInt(id),
         exercise_id: exerciseId,
+        order: workoutDetails.workoutExercises.length + 1,
       });
       const updatedWorkout = await getWorkoutDetails(id);
       setWorkoutDetails(updatedWorkout);

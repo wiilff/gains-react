@@ -109,7 +109,7 @@ export default function Profile() {
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 
-      <Me user={user} />
+      <Me user={{username, email}} />
 
       <CoreButton
         title="Your Splits"
