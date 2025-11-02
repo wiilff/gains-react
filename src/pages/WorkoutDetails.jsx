@@ -84,7 +84,7 @@ export default function WorkoutDetails() {
 
   const submitExercise = async (e) => {
     e.preventDefault();
-    
+
     const exercise = {
       name: newExerciseName,
       muscleGroup: selectedMuscleGroup
@@ -136,13 +136,13 @@ export default function WorkoutDetails() {
       workoutExercises: prev.workoutExercises.map((exercise) =>
         exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...exercise,
-              sets: exercise.sets.map((set) =>
-                (set.id || set.tempId) === setIdentifier
-                  ? { ...set, [field]: value }
-                  : set
-              ),
-            }
+            ...exercise,
+            sets: exercise.sets.map((set) =>
+              (set.id || set.tempId) === setIdentifier
+                ? { ...set, [field]: value }
+                : set
+            ),
+          }
           : exercise
       ),
     }));
@@ -154,17 +154,17 @@ export default function WorkoutDetails() {
       workoutExercises: prev.workoutExercises.map((exercise) =>
         exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...exercise,
-              sets: [
-                ...(exercise.sets || []),
-                {
-                  tempId: uuidv4(),
-                  reps: "",
-                  weight: "",
-                  order: (exercise.sets?.length || 0) + 1,
-                },
-              ],
-            }
+            ...exercise,
+            sets: [
+              ...(exercise.sets || []),
+              {
+                tempId: uuidv4(),
+                reps: "",
+                weight: "",
+                order: (exercise.sets?.length || 0) + 1,
+              },
+            ],
+          }
           : exercise
       ),
     }));
@@ -176,11 +176,11 @@ export default function WorkoutDetails() {
       workoutExercises: prev.workoutExercises.map((exercise) =>
         exercise.workoutExerciseId === workoutExerciseId
           ? {
-              ...exercise,
-              sets: exercise.sets.filter(
-                (set) => (set.id || set.tempId) !== setIdentifier
-              ),
-            }
+            ...exercise,
+            sets: exercise.sets.filter(
+              (set) => (set.id || set.tempId) !== setIdentifier
+            ),
+          }
           : exercise
       ),
     }));
@@ -228,21 +228,24 @@ export default function WorkoutDetails() {
     }
 
     // Validate numbers
-    const invalidSet = exercise.sets.find(
-      (set) => isNaN(set.reps) || isNaN(set.weight)
-    );
+    const invalidSet = exercise.sets.find((set) => {
+      const reps = String(set.reps).replace(",", ".");
+      const weight = String(set.weight).replace(",", ".");
+      return isNaN(reps) || isNaN(weight);
+    });
+
     if (invalidSet) {
       showPopup("Only numbers, please", "error");
       return;
     }
 
     const now = new Date().toISOString();
-    
+
 
     const payload = exercise.sets.map((set, index) => ({
       id: set.id,
-      reps: parseFloat(set.reps),
-      weight: parseFloat(set.weight),
+      reps: Number(String(set.reps).replace(",", ".")),
+      weight: Number(String(set.weight).replace(",", ".")),
       order: index + 1,
       loggedAt: now
     }));
@@ -377,8 +380,8 @@ export default function WorkoutDetails() {
               >
                 <input
                   type="text"
-                  inputMode="numeric"
-                  pattern="\d*"
+                  inputMode="decimal"
+                  pattern="[0-9]*[.,]?[0-9]*"
                   value={set.reps}
                   placeholder="Reps"
                   onChange={(e) =>
@@ -393,8 +396,8 @@ export default function WorkoutDetails() {
                 />
                 <input
                   type="text"
-                  inputMode="numeric"
-                  pattern="\d*"
+                  inputMode="decimal"
+                  pattern="[0-9]*[.,]?[0-9]*"
                   value={set.weight ?? ""}
                   placeholder="Weight"
                   onChange={(e) =>

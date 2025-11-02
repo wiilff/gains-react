@@ -4,7 +4,7 @@ import BottomNav from "../components/Nav";
 import CoreButton from "../components/CoreButton";
 import ExerciseSelector from "../components/ExerciseSelector";
 import CreateWorkoutFromSplit from "../components/CreateWorkoutFromSplit";
-import { getSplits, createSplit, updateSplit } from "../api/splits";
+import { getSplits, createSplit, updateSplit, deleteSplit } from "../api/splits";
 import { getExercises } from "../api/exercises";
 import { ChevronRight, Dumbbell, RefreshCw, Trash2, Calendar } from "lucide-react";
 import CreateWorkoutModal from "../components/CreateWorkoutModal";
@@ -75,6 +75,15 @@ export default function SplitPage() {
         setSplitExercises(exercisesByDay);
         setIsModalOpen(true);
     };
+
+    const handleDeleteSplit = async (splitId) => {
+        try {
+            await deleteSplit(splitId);
+            setSplits(prev => prev.filter(s => s.id !== splitId));
+        } catch (error) {
+            console.error("Error deleting split:", error);
+        }
+    }
 
     const clearModal = () => {
         setSelectedExercises([]);
@@ -218,7 +227,7 @@ export default function SplitPage() {
                                                 className="text-red-500 cursor-pointer"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    console.log("IMPLEMENT DELETE SPLIT", split.id)
+                                                    handleDeleteSplit(split.id)
                                                 }}
                                             />
                                         </div>

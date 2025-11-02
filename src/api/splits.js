@@ -15,7 +15,12 @@ export const updateSplit = async (splitId, splitData) => {
   return res.data;
 }
 
-export const postSplit = async (workoutId, data) => {
+export const postSplitToWorkout = async (workoutId, data) => {
   const res = await api.post(`/api/workouts/exercises/${workoutId}`, data);
+  return res.data;
+}
+
+export const deleteSplit = async (splitId) => {
+  const res = await api.delete(`/api/splits/${splitId}`);
   return res.data;
 }

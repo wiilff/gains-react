@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import CoreButton from "./CoreButton";
 import { createWorkout } from "../api/workouts";
-import { postSplit } from "../api/splits";
+import { postSplitToWorkout } from "../api/splits";
 import { useNavigate } from "react-router-dom";
 import { Dumbbell } from "lucide-react";
 
@@ -78,7 +78,7 @@ export default function CreateWorkoutFromSplit({ split, isOpen, onClose }) {
             if (res?.id) {
 
                 if(exerciseIds.length > 0) {
-                    await postSplit(res.id, exerciseIds);
+                    await postSplitToWorkout(res.id, exerciseIds);
                 }
 
                 onClose?.();
