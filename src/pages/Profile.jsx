@@ -16,7 +16,7 @@ import Friends from "../components/Friends";
 import CoreButton from "../components/CoreButton";
 import { useNavigate } from "react-router-dom";
 
-import { Trash2, RefreshCw } from "lucide-react";
+import { Trash2, RefreshCw, Dumbbell } from "lucide-react";
 import CreateWorkoutModal from "../components/CreateWorkoutModal";
 import Popup from "../components/Popup";
 
@@ -115,6 +115,7 @@ export default function Profile() {
         title="Your Splits"
         className="w-full mt-4"
         onClick={() => navigate("/splits")}
+        Icon={Dumbbell}
       />
 
       {/*  
