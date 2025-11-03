@@ -34,6 +34,7 @@ export default function Workouts() {
   const [shared, setShared] = useState(false);
 
   const [popupMessage, setPopupMessage] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const [editingWorkout, setEditingWorkout] = useState(null);
 
@@ -77,23 +78,30 @@ export default function Workouts() {
     fetchData();
   }, []);
 
+  const validateInputs = () => {
+    const errors = {};
+
+    // Workout name
+    if (!workoutName.trim()) {
+      errors.workoutName = "Workout name is required";
+    }
+
+    // Workout date validation (Date object)
+    if (!(workoutDate instanceof Date) || isNaN(workoutDate.getTime())) {
+      errors.date = "Please pick a valid date";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const submitWorkout = async (e) => {
     e.preventDefault();
 
-    // ensure we have a valid Date object
-    const dateObj =
-      workoutDate instanceof Date ? workoutDate : new Date(workoutDate);
+    if (!validateInputs()) return;
 
-    if (!dateObj || isNaN(dateObj.getTime())) {
-      showPopup("Please pick a valid date", "error");
-      return;
-    }
-
-    const year = dateObj.getFullYear();
-    const month = dateObj.getMonth();
-    const day = dateObj.getDate();
-
-    const utcDate = new Date(Date.UTC(year, month, day, 12, 0, 0));
+    const [month, day, year] = workoutDate.split("/").map(Number);
+    const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
     const workout = {
       name: workoutName,
@@ -167,7 +175,10 @@ export default function Workouts() {
         <CoreButton
           className="w-full"
           title="Create a new workout"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            setEditingWorkout(null);
+          }}
         />
 
         {/* Page content */}
@@ -253,24 +264,51 @@ export default function Workouts() {
         onClose={() => clearModal()}
         title={editingWorkout ? "Edit Workout" : "Create a New Workout"}
       >
-        <form className="space-y-4" onSubmit={submitWorkout}>
-          <input
-            type="text"
-            placeholder="Workout name"
-            value={workoutName}
-            onChange={(e) => setWorkoutName(e.target.value)}
-            className="border-2 border-gray-300 rounded-lg w-full p-2 mb-4 focus:outline-none focus:border-blue-500"
-          />
-
+        <form className="space-y-2" onSubmit={submitWorkout}>
+          <div>
+            <input
+              type="text"
+              placeholder="Workout name"
+              value={workoutName}
+              onChange={(e) => {
+                setWorkoutName(e.target.value);
+                setValidationErrors({});
+              }}
+              className={`border-2 ${
+                validationErrors.workoutName
+                  ? "border-red-500"
+                  : "border-gray-300"
+              } rounded-lg w-full p-2 focus:outline-none focus:border-blue-500`}
+            />
+            <p
+              className={`text-red-500 text-sm min-h-[1.25rem] ${
+                validationErrors.workoutName ? "visible" : "invisible"
+              }`}
+            >
+              {validationErrors.workoutName || "placeholder"}
+            </p>
+          </div>
           <div className="relative w-full">
             <DatePicker
               placeholderText="Date"
               selected={workoutDate}
-              onChange={(date) => setWorkoutDate(date)}
-              className="border-2 border-gray-300 rounded-lg w-full p-2 focus:outline-none focus:border-blue-500"
+              onChange={(date) => {
+                setWorkoutDate(date);
+                setValidationErrors({});
+              }}
               wrapperClassName="w-full"
               popperClassName="absolute z-50"
+              className={`border-2 ${
+                validationErrors.date ? "border-red-500" : "border-gray-300"
+              } rounded-lg w-full p-2 focus:outline-none focus:border-blue-500`}
             />
+            <p
+              className={`text-red-500 text-sm min-h-[1.25rem] ${
+                validationErrors.date ? "visible" : "invisible"
+              }`}
+            >
+              {validationErrors.date || "placeholder"}
+            </p>
           </div>
 
           {/* 
