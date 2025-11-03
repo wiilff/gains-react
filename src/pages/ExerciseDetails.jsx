@@ -59,8 +59,9 @@ export default function ExeciseDetails() {
       <PersonalRecords exerciseDetails={exerciseDetails} />
 
       <div className="mt-6 space-y-6">
-        {exerciseDetails.map((detail, index) =>
-          detail.sets.length > 0 ? (
+        {exerciseDetails
+        .filter((detail) => detail.sets.length > 0)
+        .map((detail, index) => (
             <div
               key={index}
               className="bg-gray-300 p-4 rounded-xl shadow-md border border-gray-200"
@@ -96,12 +97,7 @@ export default function ExeciseDetails() {
                 ))}
               </div>
             </div>
-          ) : (
-            <div>
-              <p>No data yet</p>
-            </div>
-          )
-        )}
+        ))}
       </div>
 
       {/* Bottom Navigation */}

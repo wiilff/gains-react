@@ -100,8 +100,18 @@ export default function Workouts() {
 
     if (!validateInputs()) return;
 
-    const [month, day, year] = workoutDate.split("/").map(Number);
-    const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+    const dateObj =
+      workoutDate instanceof Date ? workoutDate : new Date(workoutDate);
+
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      return;
+    }
+
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth()
+    const day = dateObj.getDate();
+
+    const utcDate = new Date(Date.UTC(year, month, day, 12, 0, 0));
 
     const workout = {
       name: workoutName,
