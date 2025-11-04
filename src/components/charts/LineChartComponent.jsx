@@ -17,7 +17,7 @@ export function LineChartComponent({ data, xKey, lines = [], hideYAxis = false }
       <ResponsiveContainer>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xKey} />
+          <XAxis dataKey={xKey} reversed/>
           <YAxis hide={hideYAxis} />
           <Tooltip />
           <Legend />
