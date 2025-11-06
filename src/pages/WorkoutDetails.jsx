@@ -475,7 +475,7 @@ export default function WorkoutDetails() {
             ))}
           </select>
 
-          <CoreButton className="w-full" title="Create exercise" />
+          <CoreButton className="w-full" title="Create exercise" type="submit"/>
         </form>
       </CreateWorkoutModal>
 
