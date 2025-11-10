@@ -1,29 +1,32 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Loading from "../components/Loading";
 import api, { setAccessToken } from "../api/axios";
+import Loading from "../components/Loading";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Try refresh on mount
     const tryRefresh = async () => {
       try {
         const res = await api.post("/api/auth/refresh");
-        setAccessToken(res.data.token);
-        setUser(res.data.email);
+        if (res.data.token) {
+          setAccessToken(res.data.token);
+          setUser(res.data.email);
+        }
       } catch (err) {
-        setAccessToken(null);
+        console.log("Refresh failed:", err);
+        // Don't clear token here — user might login immediately after
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
     tryRefresh();
   }, []);
 
@@ -33,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await api.post("/api/auth/login", { email, password });
-      setAccessToken(res.data.token);
+      if (res.data.token) setAccessToken(res.data.token);
       setUser(res.data.email);
       navigate("/");
     } finally {
@@ -44,12 +47,8 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     setLoading(true);
     try {
-      const res = await api.post("/api/auth/register", {
-        name,
-        email,
-        password,
-      });
-      setAccessToken(res.data.token);
+      const res = await api.post("/api/auth/register", { name, email, password });
+      if (res.data.token) setAccessToken(res.data.token);
       setUser(res.data.email);
       navigate("/");
     } finally {
@@ -71,36 +70,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const deleteAccount = async () => {
-    setLoading(true);
-    try {
-      await api.delete("/api/auth");
-    } catch (err) {
-      console.error("Account deletion failed", err);
-    } finally {
-      setAccessToken(null);
-      setUser(null);
-      setLoading(false);
-      navigate("/login");
-    }
-  }
-
-  const updateAccount = async (data) => {
-    setLoading(true);
-    try {
-      const res = await api.put("/api/auth", data);
-      setUser(res.data.email);
-      setAccessToken(res.data.token);
-    } catch (err) {
-      console.error("Account update failed", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, deleteAccount, updateAccount, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
