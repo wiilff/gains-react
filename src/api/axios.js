@@ -27,12 +27,15 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Only retry once
-    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry && !originalRequest.url.includes("/api/auth/refresh")) {
       originalRequest._retry = true;
       try {
         // Call refresh endpoint
         const res = await api.post("/api/auth/refresh");
         const newToken = res.data.token;
+
+        if (!newToken) throw new Error("No token returned");
+
         setAccessToken(newToken);
 
         // Retry original request with new token
@@ -41,7 +44,10 @@ api.interceptors.response.use(
       } catch (err) {
         // Refresh failed, logout
         setAccessToken(null);
-        window.location.href = "/login";
+        if(!originalRequest.url.includes("/api/auth/refresh")) {
+          window.location.href = "/login";
+        }
+        
         return Promise.reject(err);
       }
     }
