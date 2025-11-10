@@ -39,10 +39,17 @@ export function getTimeSpent(workouts, filter = "weekly") {
 }
 
 export function getMuscleGroupsTrained(workouts, filter = "weekly") {
-
   const now = new Date();
+  now.setHours(23, 59, 59, 999);
+
   const start = new Date();
-  start.setDate(now.getDate() - (filter === "monthly" ? 30 : 7));
+  if (filter === "monthly") {
+    start.setDate(now.getDate() - 30);
+  } else if (filter === "weekly") {
+    start.setDate(now.getDate() - 7);
+  } else if (filter === "all-time") {
+    start.setTime(0);
+  }
 
   const muscleCounts = {};
 
@@ -50,15 +57,13 @@ export function getMuscleGroupsTrained(workouts, filter = "weekly") {
     if (!workout.sets?.length) return;
 
     const workoutDate = new Date(workout.date);
-    if(workoutDate < start || workoutDate > now) return
+    if (workoutDate < start || workoutDate > now) return;
 
     const group = workout.muscleGroup;
     muscleCounts[group] = (muscleCounts[group] || 0) + workout.sets.length;
   });
 
-  // Convert to array of objects
-  return Object.entries(muscleCounts).map(([muscleGroup, count]) => ({
-    muscleGroup,
-    count,
-  }));
+  return Object.entries(muscleCounts)
+    .map(([muscleGroup, count]) => ({ muscleGroup, count }))
+    .sort((a, b) => b.count - a.count);
 }

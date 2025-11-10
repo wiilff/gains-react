@@ -25,12 +25,20 @@ export default function ChartCard({ title, children, onFilterChange }) {
           Weekly
         </button>
         <button
-          className={`flex-1 py-1 text-center transition-colors ${
+          className={`flex-1 py-1 text-center transition-colors border-r-1 border-l-1 border-blue-600 ${
             filter === "monthly" ? "bg-blue-600 font-semibold text-white" : "bg-white font-semibold"
           }`}
           onClick={() => handleChange("monthly")}
         >
           Monthly
+        </button>
+        <button
+          className={`flex-1 py-1 text-center transition-colors ${
+            filter === "all-time" ? "bg-blue-600 font-semibold text-white" : "bg-white font-semibold"
+          }`}
+          onClick={() => handleChange("all-time")}
+        >
+          All Time
         </button>
       </div>
 
