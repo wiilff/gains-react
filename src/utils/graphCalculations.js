@@ -67,3 +67,38 @@ export function getMuscleGroupsTrained(workouts, filter = "weekly") {
     .map(([muscleGroup, count]) => ({ muscleGroup, count }))
     .sort((a, b) => b.count - a.count);
 }
+
+export const volumeData = (data) => {
+  return data
+    .filter((d) => d.sets.length > 0)
+    .map((d) => ({
+      date: new Date(d.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      volume: d.sets.reduce((sum, s) => sum + s.reps * (s.weight || 1), 0),
+    }));
+}
+
+export const topSetData = (data) => {
+  return data
+    .filter((d) => d.sets && d.sets.length > 0)
+    .map((d) => {
+      const topSet = d.sets.reduce((best, current) => {
+        if (!best) return current;
+        if (current.weight > best.weight) return current;
+        if (current.weight === best.weight && current.reps > best.reps) return current;
+        return best;
+      });
+
+      return {
+        date: new Date(d.date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
+        weight: topSet.weight,
+        topSet: topSet.weight * topSet.reps,
+        label: `${topSet.reps}×${topSet.weight}kg`,
+      };
+    });
+}

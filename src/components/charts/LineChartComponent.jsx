@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export function LineChartComponent({ data, xKey, lines = [], hideYAxis = false }) {
+export function LineChartComponent({ data, xKey, lines = [], hideYAxis = false, tooltipFormatter }) {
   if (!data || data.length === 0) return null;
 
   return (
@@ -17,9 +17,17 @@ export function LineChartComponent({ data, xKey, lines = [], hideYAxis = false }
       <ResponsiveContainer>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xKey} reversed/>
+          <XAxis dataKey={xKey} reversed />
           <YAxis hide={hideYAxis} />
-          <Tooltip />
+          {!hideYAxis && <YAxis />}
+          <Tooltip
+            formatter={
+              tooltipFormatter
+                ? tooltipFormatter
+                : (value) => value
+            }
+            labelStyle={{ color: "#6B7280" }}
+          />
           <Legend />
           {lines.map((line, idx) => (
             <Line

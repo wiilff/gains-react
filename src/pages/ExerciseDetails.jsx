@@ -6,6 +6,7 @@ import { LineChartComponent } from "../components/charts/LineChartComponent.jsx"
 import PersonalRecords from "../components/PersonalRecords.jsx";
 import { getExerciseDetails } from "../api/exercises.js";
 import { useEffect, useState, useMemo } from "react";
+import { volumeData, topSetData } from "../utils/graphCalculations.js"
 
 export default function ExeciseDetails() {
   const [loading, setLoading] = useState(true);
@@ -23,10 +24,14 @@ export default function ExeciseDetails() {
         setLoading(false);
       }
     };
-
     fetchData();
+    
   }, []);
 
+  const volumeGraphData = volumeData(exerciseDetails);
+  const topSetGraphData = topSetData(exerciseDetails);
+
+  /*
   const volumeData = useMemo(() => {
     return exerciseDetails
       .filter((d) => d.sets.length > 0)
@@ -38,6 +43,7 @@ export default function ExeciseDetails() {
         volume: d.sets.reduce((sum, s) => sum + s.reps * (s.weight || 1), 0),
       }));
   }, [exerciseDetails]);
+  */
 
   if (loading) return <Loading />;
 
@@ -50,10 +56,18 @@ export default function ExeciseDetails() {
       />
 
       <LineChartComponent
-        data={volumeData}
+        data={volumeGraphData}
         xKey="date"
         lines={[{ yKey: "volume", color: "#4F46E5", name: "Volume" }]}
         hideYAxis={true}
+      />
+
+      <LineChartComponent
+        data={topSetGraphData}
+        xKey="date"
+        lines={[{ yKey: "weight", color: "#4F46E5", name: "Top Set" }]}
+        hideYAxis={true}
+        tooltipFormatter={(value, name, props) => props.payload.label}
       />
 
       <PersonalRecords exerciseDetails={exerciseDetails} />
