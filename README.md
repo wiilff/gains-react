@@ -1,2 +1,16 @@
-Track gym progress with friends
-http://68.183.65.231/
+# Prerequisites
+
+- Node and npm
+
+
+Create a .env file in project root
+
+````
+VITE_API_URL=
+````
+
+## Run:
+
+``$ npm install``
+
+``$ npm run dev``
