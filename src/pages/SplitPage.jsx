@@ -156,16 +156,16 @@ export default function SplitPage() {
     };
 
     return (
-        <div className="min-h-screen pt-16 pb-16">
+        <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-70">
             {/* Header */}
             <Header
-                title="LIGHT WEIGHT BABY"
+                title="SPLITS"
                 profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
             />
 
-            <div className="px-7 mt-6 md:mx-20 lg:mx-50">
+    
                 <CoreButton
-                    className="w-full"
+                    className="w-full mt-6"
                     title="Create a new split"
                     onClick={() => setIsModalOpen(true)}
                 />
@@ -239,7 +239,7 @@ export default function SplitPage() {
                         })
                     )}
                 </div>
-            </div>
+            
 
             {/* Bottom Navigation */}
             <BottomNav currPage={"Profile"} />

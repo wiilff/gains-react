@@ -28,6 +28,16 @@ export default function Workouts() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [workoutsPerPage] = useState(10);
+
+  const indexOfLastWorkout = currentPage * workoutsPerPage;
+  const indexOfFirstWorkout = indexOfLastWorkout - workoutsPerPage;
+  const currentWorkouts = workouts.slice(
+    indexOfFirstWorkout,
+    indexOfLastWorkout
+  );
+
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDate, setWorkoutDate] = useState(new Date());
   const [workoutNotes, setWorkoutNotes] = useState("");
@@ -108,7 +118,7 @@ export default function Workouts() {
     }
 
     const year = dateObj.getFullYear();
-    const month = dateObj.getMonth()
+    const month = dateObj.getMonth();
     const day = dateObj.getDate();
 
     const utcDate = new Date(Date.UTC(year, month, day, 12, 0, 0));
@@ -174,99 +184,128 @@ export default function Workouts() {
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen pt-16 pb-16">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-70">
       {/* Header */}
       <Header
-        title="LIGHT WEIGHT BABY"
+        title="WORKOUTS"
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 
-      <div className="px-7 mt-6 md:mx-20 lg:mx-50">
-        <CoreButton
-          className="w-full"
-          title="Create a new workout"
-          onClick={() => {
-            setIsModalOpen(true);
-            setEditingWorkout(null);
-          }}
-        />
+      <CoreButton
+        className="w-full mt-6"
+        title="Create a new workout"
+        onClick={() => {
+          setIsModalOpen(true);
+          setEditingWorkout(null);
+        }}
+      />
 
-        {/* Page content */}
-        <div className="mt-6 mb-6">
-          <h1 className="text-2xl font-semibold">Recent workouts</h1>
-        </div>
-
-        {/* CARDS */}
-        <div className="space-y-4">
-          {workouts.map((workout) => (
-            <div
-              key={workout.id}
-              className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition cursor-pointer"
-              onClick={() => navigate(`/workout/${workout.id}`)}
-            >
-              {/* Top: Title and Chevron */}
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-lg font-semibold">
-                  {workout.name.toUpperCase()}
-                </h2>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
-              </div>
-
-              {/* Date */}
-              <p className="text-gray-500 text-sm mb-2">
-                {new Date(workout.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </p>
-
-              {/* Main row: Exercises/Sets + Icons */}
-              <div className="flex items-center justify-between text-gray-700 text-sm">
-                {/* Left: Exercises/Sets */}
-                <div className="flex items-center">
-                  <Dumbbell className="w-4 h-4 mr-2 text-blue-500" />
-                  <span>{workout.exerciseCount} Exercises,</span>
-                  <span className="ml-1">{workout.setCount} Sets</span>
-                </div>
-
-                {/* Right: Edit/Delete icons */}
-                <div className="flex space-x-2">
-                  <RefreshCw
-                    className="text-green-600 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(workout);
-                    }}
-                  />
-                  <Trash2
-                    className="text-red-500 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteWorkout(workout.id);
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Optional: notes below */}
-              {workout.notes && (
-                <div className="flex items-center text-gray-700 text-sm mt-2">
-                  <NotepadText className="w-4 h-4 mr-2 text-blue-500" />
-                  <span>{workout.notes}</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {popupMessage && (
-          <Popup message={popupMessage} onClose={() => setPopupMessage(null)} />
-        )}
-
-        {/* Bottom Navigation */}
-        <BottomNav currPage={"Home"} />
+      {/* Page content */}
+      <div className="mt-6 mb-6">
+        <h1 className="text-2xl font-semibold">Recent workouts</h1>
       </div>
+
+      {/* CARDS */}
+      <div className="space-y-4">
+        {currentWorkouts.map((workout) => (
+          <div
+            key={workout.id}
+            className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition cursor-pointer"
+            onClick={() => navigate(`/workout/${workout.id}`)}
+          >
+            {/* Top: Title and Chevron */}
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold">
+                {workout.name.toUpperCase()}
+              </h2>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            </div>
+
+            {/* Date */}
+            <p className="text-gray-500 text-sm mb-2">
+              {new Date(workout.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </p>
+
+            {/* Main row: Exercises/Sets + Icons */}
+            <div className="flex items-center justify-between text-gray-700 text-sm">
+              {/* Left: Exercises/Sets */}
+              <div className="flex items-center">
+                <Dumbbell className="w-4 h-4 mr-2 text-blue-500" />
+                <span>{workout.exerciseCount} Exercises,</span>
+                <span className="ml-1">{workout.setCount} Sets</span>
+              </div>
+
+              {/* Right: Edit/Delete icons */}
+              <div className="flex space-x-2">
+                <RefreshCw
+                  className="text-green-600 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEditModal(workout);
+                  }}
+                />
+                <Trash2
+                  className="text-red-500 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteWorkout(workout.id);
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Optional: notes below */}
+            {workout.notes && (
+              <div className="flex items-center text-gray-700 text-sm mt-2">
+                <NotepadText className="w-4 h-4 mr-2 text-blue-500" />
+                <span>{workout.notes}</span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-center items-center space-x-4 mt-6">
+        {/* Previous */}
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="text-blue-600 font-semibold hover:underline disabled:text-gray-400 disabled:cursor-not-allowed transition"
+        >
+          Prev
+        </button>
+
+        {/* Current page */}
+        <span className="font-small text-gray-700">
+          Page {currentPage} of {Math.ceil(workouts.length / workoutsPerPage)}
+        </span>
+
+        {/* Next */}
+        <button
+          onClick={() =>
+            setCurrentPage((prev) =>
+              Math.min(prev + 1, Math.ceil(workouts.length / workoutsPerPage))
+            )
+          }
+          disabled={
+            currentPage === Math.ceil(workouts.length / workoutsPerPage)
+          }
+          className="text-blue-600 font-semibold hover:underline disabled:text-gray-400 disabled:cursor-not-allowed transition"
+        >
+          Next
+        </button>
+      </div>
+
+      {popupMessage && (
+        <Popup message={popupMessage} onClose={() => setPopupMessage(null)} />
+      )}
+
+      {/* Bottom Navigation */}
+      <BottomNav currPage={"Home"} />
 
       {/* Modal */}
       <CreateWorkoutModal

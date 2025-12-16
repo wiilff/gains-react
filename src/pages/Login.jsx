@@ -60,7 +60,7 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <Header title="LIGHT WEIGHT BABY" />
+      
       <div className="bg-white rounded-2xl shadow-lg w-11/12 max-w-md p-6 relative border-2 border-gray-200">
         <h2 className="text-2xl font-semibold mb-4 text-center">
           {isRegister ? "Register" : "Login"}

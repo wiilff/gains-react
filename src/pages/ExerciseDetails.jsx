@@ -6,7 +6,7 @@ import { LineChartComponent } from "../components/charts/LineChartComponent.jsx"
 import PersonalRecords from "../components/PersonalRecords.jsx";
 import { getExerciseDetails } from "../api/exercises.js";
 import { useEffect, useState, useMemo } from "react";
-import { volumeData, topSetData } from "../utils/graphCalculations.js"
+import { volumeData, topSetData } from "../utils/graphCalculations.js";
 
 export default function ExeciseDetails() {
   const [loading, setLoading] = useState(true);
@@ -25,30 +25,15 @@ export default function ExeciseDetails() {
       }
     };
     fetchData();
-    
   }, []);
 
   const volumeGraphData = volumeData(exerciseDetails);
   const topSetGraphData = topSetData(exerciseDetails);
 
-  /*
-  const volumeData = useMemo(() => {
-    return exerciseDetails
-      .filter((d) => d.sets.length > 0)
-      .map((d) => ({
-        date: new Date(d.date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-        volume: d.sets.reduce((sum, s) => sum + s.reps * (s.weight || 1), 0),
-      }));
-  }, [exerciseDetails]);
-  */
-
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-70">
       {/* Header */}
       <Header
         title={exerciseDetails[0].exerciseName.toUpperCase()}
@@ -74,8 +59,8 @@ export default function ExeciseDetails() {
 
       <div className="mt-6 space-y-6">
         {exerciseDetails
-        .filter((detail) => detail.sets.length > 0)
-        .map((detail, index) => (
+          .filter((detail) => detail.sets.length > 0)
+          .map((detail, index) => (
             <div
               key={index}
               className="bg-gray-300 p-4 rounded-xl shadow-md border border-gray-200"
@@ -111,7 +96,7 @@ export default function ExeciseDetails() {
                 ))}
               </div>
             </div>
-        ))}
+          ))}
       </div>
 
       {/* Bottom Navigation */}

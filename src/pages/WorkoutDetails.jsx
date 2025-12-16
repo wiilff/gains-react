@@ -285,7 +285,7 @@ export default function WorkoutDetails() {
   if (loading) return <Loading />;
 
   return (
-    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-70">
       {/* Header */}
       <Header
         title={workoutDetails.workoutName.toUpperCase()}

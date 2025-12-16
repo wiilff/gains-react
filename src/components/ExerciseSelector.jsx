@@ -41,7 +41,7 @@ export default function ExerciseSelector({ exercises, selectedExercises, onAdd, 
                   className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
                 >
                   <Dumbbell className="w-4 h-4 mr-2 text-blue-500" />
-                  {exercise.name}
+                  {exercise.name.toUpperCase()}
                 </div>
               ))}
             </div>
@@ -56,7 +56,7 @@ export default function ExerciseSelector({ exercises, selectedExercises, onAdd, 
             <div key={exercise.id} className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
               <div className="flex items-center">
                 <Dumbbell className="w-4 h-4 mr-2 text-blue-500" />
-                <span>{exercise.name}</span>
+                <span>{exercise.name.toUpperCase()}</span>
               </div>
               <button
                 type="button"

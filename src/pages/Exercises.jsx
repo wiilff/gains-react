@@ -39,10 +39,10 @@ export default function Exercises() {
   };
 
   return (
-    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-70">
       {/* Header */}
       <Header
-        title="LIGHT WEIGHT BABY"
+        title="EXERCISES"
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 

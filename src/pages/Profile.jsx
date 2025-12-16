@@ -102,10 +102,10 @@ export default function Profile() {
   if (!profileData) return <Loading></Loading>;
 
   return (
-    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-50">
+    <div className="min-h-screen pt-16 pb-16 px-7 md:mx-20 lg:mx-70">
       {/* Header */}
       <Header
-        title="Profile"
+        title="PROFILE"
         profileImage="https://i.pravatar.cc/150?img=3" // demo avatar
       />
 
@@ -157,6 +157,7 @@ export default function Profile() {
           openEditModal();
         }}
         Icon={RefreshCw}
+        hover="hover:bg-yellow-600"
       />
 
       <CoreButton
@@ -164,6 +165,7 @@ export default function Profile() {
         className="w-full mt-4 bg-red-500"
         onClick={() => deleteAccount()}
         Icon={Trash2}
+        hover="hover:bg-red-700"
       />
 
       {popupMessage && (
@@ -212,6 +214,7 @@ export default function Profile() {
             title={"Save Changes"}
             onClick={updateUser}
           />
+
         </form>
       </CreateWorkoutModal>
     </div>
